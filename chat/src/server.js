@@ -1,5 +1,5 @@
-const express = require('express');
 const Gun = require('gun');
+const express = require('express');
 
 const app = express();
 const port = 4000;
@@ -9,4 +9,4 @@ const server = app.listen(port, () => {
 	console.log(`Listening on port ${port}`);
 });
 
-Gun({ web: server, localStorage: false });
+Gun({ file: 'db/data', web: server, localStorage: false });

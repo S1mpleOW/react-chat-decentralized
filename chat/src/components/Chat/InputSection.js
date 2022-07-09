@@ -1,13 +1,18 @@
 import React, { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import { Spin } from 'react-cssfx-loading';
 import { useParams } from 'react-router-dom';
-import { useMessageContext } from '../../contexts/messageContext';
+// import { useMessageContext } from '../../contexts/messageContext';
 import ClickAway from '../../pattern/renderProps/ClickAway';
 import getIcon from '../../utils/constants';
 import { getFileName } from '../../utils/helper';
+import Gun from 'gun';
 const Picker = lazy(() => import('./PickEmoji'));
 
-const InputSection = ({ disabled }) => {
+const gun = new Gun({
+	peers: ['http://localhost:4000/gun'],
+});
+let i = 0;
+const InputSection = ({ setInputSectionOffset, disabled }) => {
 	const [fileDragging, setFileDragging] = useState(false);
 	const [previewFiles, setPreviewFiles] = useState([]);
 	const [fileUploading, setFileUploading] = useState(false);
@@ -17,8 +22,8 @@ const InputSection = ({ disabled }) => {
 	const imageInputRef = useRef(null);
 	const fileInputRef = useRef(null);
 
-	const { state, dispatch } = useMessageContext();
-	console.log(state);
+	// const { state, dispatch } = useMessageContext();
+	// console.log(state);
 	const conversationId = useParams();
 	const checkFileExists = useCallback(
 		(file) => {
@@ -40,13 +45,6 @@ const InputSection = ({ disabled }) => {
 	useEffect(() => {
 		textInputRef.current?.focus();
 	}, [conversationId]);
-	useEffect(() => {
-		const handler = () => {
-			textInputRef.current?.focus();
-		};
-		window.addEventListener('focus', handler);
-		return () => window.removeEventListener('focus', handler);
-	}, []);
 
 	useEffect(() => {
 		const dragBlurHandler = (e) => {
@@ -100,10 +98,23 @@ const InputSection = ({ disabled }) => {
 	}, [previewFiles]);
 
 	useEffect(() => {
-		dispatch({
-			type: 'GET_MESSAGES',
-		});
-	}, [dispatch]);
+		if (!setInputSectionOffset) return;
+		if (previewFiles.length > 0) return setInputSectionOffset(128);
+		setInputSectionOffset(0);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [previewFiles.length]);
+	console.log('re-render');
+	useEffect(() => {
+		let messages = [];
+		gun
+			.get('messages-room1')
+			.map()
+			.once((data) => {
+				const id = data['_']['#'];
+				if (!messages[id]) messages[id] = data?.messages;
+				console.log(messages);
+			});
+	}, []);
 
 	const handleFileInputChange = (e) => {
 		console.log(e.target);
@@ -114,12 +125,17 @@ const InputSection = ({ disabled }) => {
 		const messages = e.target.elements['messages']?.value;
 		console.log(messages);
 		if (messages) {
-			dispatch({
-				type: 'ADD_MESSAGE',
-				payload: {
-					conversationId,
-					messages,
-				},
+			// dispatch({
+			// 	type: 'ADD_MESSAGE',
+			// 	payload: {
+			// 		conversationId,
+			// 		messages,
+			// 	},
+			// });
+			gun.get('messages-room1').set({
+				conversationId,
+				messages,
+				createdAt: Date.now(),
 			});
 			setInputValue('');
 		}
