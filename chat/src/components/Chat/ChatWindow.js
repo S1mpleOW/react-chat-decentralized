@@ -14,6 +14,7 @@ const ChatWindow = ({ inputSectionOffset = 0 }) => {
 		state: { messages },
 		dispatch,
 	} = useMessageContext();
+
 	useEffect(() => {
 		if (!conversationId) return;
 		gun
@@ -34,6 +35,7 @@ const ChatWindow = ({ inputSectionOffset = 0 }) => {
 	}, []);
 
 	const size = messages && messages.length;
+	console.log('mess: ', messages)
 	return (
 		<InfiniteScroll
 			next={() => setLimitCount((prev) => prev + 10)}

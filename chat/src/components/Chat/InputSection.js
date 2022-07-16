@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Spin } from 'react-cssfx-loading';
 import { useParams } from 'react-router-dom';
 import getIcon from '../../utils/constants';
-import { getFileName } from '../../utils/helper';
+import { getFileName, toBase64, setGun, getFileType } from '../../utils/helper';
 import InputSendMessage from './InputSendMessage';
 import IconPicker from './IconPicker';
 import { gun } from '../../App';
@@ -97,22 +97,41 @@ const InputSection = ({ setInputSectionOffset, disabled }) => {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [previewFiles.length]);
 
-	const handleFileInputChange = (e) => {
-		console.log(e.target);
+	///////////DIEN coded
+
+	const handleFileInputChange = async (e) => {
+		const uploadFiles = await e.target.files
+		setPreviewFiles(previewFiles => [...previewFiles,...uploadFiles]);
 	};
+
+	const pushAllFiles = files => {
+		let fileList = [];
+
+		files.map(async (file) => {
+			const base64File = await toBase64(file);
+			console.log({type: getFileType(base64File), content: base64File})
+			setGun(gun, 'messages-room1', {type: getFileType(base64File), content: base64File}, '1', '2')
+			fileList.push(base64File);
+		})
+
+		return fileList;
+	}
+
 	const handleFormSubmit = (e) => {
 		e.preventDefault();
-		const message = e.target.elements['messages']?.value;
-
-		if (message) {
-			gun.get('messages-room1').set({
-				sender: '1',
-				message,
-				receiver: '2',
-				createdAt: Date.now(),
-			});
-			setInputValue('');
+		
+		///////////////DIEN coded
+		if(previewFiles.length > 0){
+			const files = [...previewFiles]
+			pushAllFiles(files)
+			
+			setPreviewFiles([])
 		}
+		
+		const message = e.target.elements['messages']?.value;
+		if (message) setGun(gun, 'messages-room1', message, '1', '2')
+
+		setInputValue('')
 	};
 	const handlePaste = (e) => {
 		const files = e?.clipboardData?.files;
@@ -170,6 +189,7 @@ const InputSection = ({ setInputSectionOffset, disabled }) => {
 					type="file"
 					accept="image/*"
 					onChange={handleFileInputChange}
+					multiple
 				/>
 				<button
 					onClick={() => fileInputRef.current?.click()}
@@ -181,8 +201,15 @@ const InputSection = ({ setInputSectionOffset, disabled }) => {
 					ref={fileInputRef}
 					hidden
 					className="hidden"
+					accept="application/msword, 
+							application/vnd.ms-excel, 
+							application/vnd.ms-powerpoint,
+							text/plain, 
+							application/pdf"
 					type="file"
 					onChange={handleFileInputChange}
+					id = "fileUploadHolder"
+					multiple
 				/>
 
 				<form onSubmit={handleFormSubmit} className="flex items-stretch flex-grow gap-1">
