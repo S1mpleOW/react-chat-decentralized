@@ -13,6 +13,8 @@ module.exports = {
 				light: '#DDDDDD',
 				'light-lighten': '#F9F3F3',
 				'gray-dark': '#eeeeee',
+				'green-primary': '#00A7B4',
+				'green-secondary': '#A4D96C',
 				primary: 'var(--primary-color)',
 			},
 		},

@@ -1,24 +1,17 @@
 import { createContext, useContext, useReducer } from 'react';
-import Gun from 'gun';
-const gun = Gun({
-	peers: ['http://localhost:4000/gun'],
-});
 
 const messageContext = createContext();
-
+// db: [conversationId, messages: [{ sender, message, receiver, createdAt }]]
 const reducer = (state, dispatch) => {
 	switch (dispatch.type) {
-		case 'ADD_MESSAGE':
-			const message = gun.get('messages-room1');
-			message.set(dispatch.payload);
-			return [...state, dispatch.payload];
 		case 'GET_MESSAGES':
-			const messages = gun.get('messages-room1');
-			let messagesArray = [];
-			messages.map().on((m) => {
-				messagesArray.push(m);
-			});
-			return [...state, ...messagesArray];
+			if (state.length === 0) {
+				return { messages: [dispatch.payload.messages] };
+			} else {
+				let newMessages = [...state?.messages, dispatch.payload?.messages];
+				newMessages = newMessages.sort((a, b) => (a.createdAt >= b.createdAt ? 1 : -1));
+				return { messages: newMessages };
+			}
 		case 'REMOVE_MESSAGE':
 			return state.filter((message) => message.id !== dispatch.payload);
 		default:

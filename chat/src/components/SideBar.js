@@ -22,6 +22,41 @@ const data = [
 		displayName: 'Karol Smith',
 		photoURL: `https://randomuser.me/api/portraits/men/${Math.ceil(Math.random() * 100)}.jpg`,
 	},
+	// {
+	// 	uid: '4',
+	// 	displayName: 'Karol Smith',
+	// 	photoURL: `https://randomuser.me/api/portraits/men/${Math.ceil(Math.random() * 100)}.jpg`,
+	// },
+	// {
+	// 	uid: '5',
+	// 	displayName: 'Karol Smith',
+	// 	photoURL: `https://randomuser.me/api/portraits/men/${Math.ceil(Math.random() * 100)}.jpg`,
+	// },
+	// {
+	// 	uid: '6',
+	// 	displayName: 'Karol Smith',
+	// 	photoURL: `https://randomuser.me/api/portraits/men/${Math.ceil(Math.random() * 100)}.jpg`,
+	// },
+	// {
+	// 	uid: '7',
+	// 	displayName: 'Karol Smith',
+	// 	photoURL: `https://randomuser.me/api/portraits/men/${Math.ceil(Math.random() * 100)}.jpg`,
+	// },
+	// {
+	// 	uid: '8',
+	// 	displayName: 'Karol Smith',
+	// 	photoURL: `https://randomuser.me/api/portraits/men/${Math.ceil(Math.random() * 100)}.jpg`,
+	// },
+	// {
+	// 	uid: '9',
+	// 	displayName: 'Karol Smith',
+	// 	photoURL: `https://randomuser.me/api/portraits/men/${Math.ceil(Math.random() * 100)}.jpg`,
+	// },
+	// {
+	// 	uid: '10',
+	// 	displayName: 'Karol Smith',
+	// 	photoURL: `https://randomuser.me/api/portraits/men/${Math.ceil(Math.random() * 100)}.jpg`,
+	// },
 ];
 const SideBar = () => {
 	const [isDropdownOpened, setIsDropdownOpened] = useState(false);
@@ -32,18 +67,18 @@ const SideBar = () => {
 	const { darkmode, setDarkmode } = useDarkmode();
 	return (
 		<div className="relative">
-			<div className="absolute bottom-0 right-0 z-10 inline-block m-3 ">
+			{/* <div className="absolute bottom-0 right-0 z-10 inline-block m-3 ">
 				<Toggle on={darkmode} onClick={() => setDarkmode(!darkmode)}></Toggle>
-			</div>
+			</div> */}
 			<div
 				className={`border-dark-green dark:border-dark-green-lighter h-screen flex-shrink-0 overflow-y-auto overflow-x-hidden border-r flex flex-col relative ${
 					location.pathname !== '/' ? 'hidden w-[350px] md:!block' : 'w-full md:!w-[350px]'
 				}`}
 			>
-				<div className="flex items-center justify-between h-20 px-6 border-b border-dark-green dark:border-dark-green-lighter">
+				<div className="flex items-center justify-between px-6 py-5 border-b border-dark-green dark:border-dark-green-lighter">
 					<Link to="/" className="flex items-center gap-2">
 						<img className="w-8 h-8" srcSet="/logo.png 2x" alt="" />
-						<h1 className="text-xl font-bold tracking-[4px] text-dark-green">2M</h1>
+						<h1 className="text-xl font-bold tracking-[2px] text-dark-green">2M</h1>
 					</Link>
 
 					<div className="flex items-center gap-2">

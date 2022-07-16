@@ -1,17 +1,12 @@
-import React, { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Spin } from 'react-cssfx-loading';
 import { useParams } from 'react-router-dom';
-// import { useMessageContext } from '../../contexts/messageContext';
-import ClickAway from '../../pattern/renderProps/ClickAway';
 import getIcon from '../../utils/constants';
 import { getFileName } from '../../utils/helper';
-import Gun from 'gun';
-const Picker = lazy(() => import('./PickEmoji'));
+import InputSendMessage from './InputSendMessage';
+import IconPicker from './IconPicker';
+import { gun } from '../../App';
 
-const gun = new Gun({
-	peers: ['http://localhost:4000/gun'],
-});
-let i = 0;
 const InputSection = ({ setInputSectionOffset, disabled }) => {
 	const [fileDragging, setFileDragging] = useState(false);
 	const [previewFiles, setPreviewFiles] = useState([]);
@@ -22,8 +17,6 @@ const InputSection = ({ setInputSectionOffset, disabled }) => {
 	const imageInputRef = useRef(null);
 	const fileInputRef = useRef(null);
 
-	// const { state, dispatch } = useMessageContext();
-	// console.log(state);
 	const conversationId = useParams();
 	const checkFileExists = useCallback(
 		(file) => {
@@ -103,57 +96,33 @@ const InputSection = ({ setInputSectionOffset, disabled }) => {
 		setInputSectionOffset(0);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [previewFiles.length]);
-	console.log('re-render');
-	useEffect(() => {
-		let messages = [];
-		gun
-			.get('messages-room1')
-			.map()
-			.once((data) => {
-				const id = data['_']['#'];
-				if (!messages[id]) messages[id] = data?.messages;
-				console.log(messages);
-			});
-	}, []);
 
 	const handleFileInputChange = (e) => {
 		console.log(e.target);
 	};
-
 	const handleFormSubmit = (e) => {
 		e.preventDefault();
-		const messages = e.target.elements['messages']?.value;
-		console.log(messages);
-		if (messages) {
-			// dispatch({
-			// 	type: 'ADD_MESSAGE',
-			// 	payload: {
-			// 		conversationId,
-			// 		messages,
-			// 	},
-			// });
+		const message = e.target.elements['messages']?.value;
+
+		if (message) {
 			gun.get('messages-room1').set({
-				conversationId,
-				messages,
+				sender: '1',
+				message,
+				receiver: '2',
 				createdAt: Date.now(),
 			});
 			setInputValue('');
 		}
 	};
 	const handlePaste = (e) => {
-		const file = e?.clipboardData?.files?.[0];
-		const url = URL.createObjectURL(file);
+		const files = e?.clipboardData?.files;
+		if (!files) return;
+		for (let i = 0; i < files.length; i++) {
+			console.log(files[i]);
+			setPreviewFiles((prev) => [...prev, files[i]]);
+		}
 	};
-	const handleAddIconToInput = (emoji) => {
-		const input = textInputRef.current;
-		const icon = emoji.native;
-		if (!input || !icon) return;
-		const start = input?.selectionStart;
-		const end = input?.selectionEnd;
-		const insertedText = input.value.split('');
-		insertedText.splice(start, end - start, emoji?.native);
-		setInputValue(insertedText.join(''));
-	};
+
 	return (
 		<>
 			{fileDragging && (
@@ -184,7 +153,7 @@ const InputSection = ({ setInputSectionOffset, disabled }) => {
 				</div>
 			)}
 			<div
-				className={`border-dark-lighten flex h-16 items-stretch gap-1 border-t px-4 ${
+				className={`border-dark-green dark:border-dark-green-lighter flex h-16 items-stretch gap-1 border-t px-4 ${
 					disabled ? 'pointer-events-none select-none' : ''
 				}`}
 			>
@@ -218,20 +187,16 @@ const InputSection = ({ setInputSectionOffset, disabled }) => {
 
 				<form onSubmit={handleFormSubmit} className="flex items-stretch flex-grow gap-1">
 					<div className="relative flex items-center flex-grow">
-						<input
+						<InputSendMessage
 							maxLength={1000}
 							disabled={disabled}
 							ref={textInputRef}
 							value={inputValue}
+							onChange={(e) => setInputValue(e.target.value)}
 							name="messages"
-							onChange={(e) => {
-								setInputValue(e.target.value);
-							}}
-							// onKeyDown={handleReplaceEmoji}
 							onPaste={handlePaste}
-							className="w-full pl-3 pr-10 rounded-full outline-none bg-dark-lighten h-9"
 							type="text"
-							placeholder="Message ..."
+							placeholder="Message..."
 						/>
 						<button
 							type="button"
@@ -243,22 +208,13 @@ const InputSection = ({ setInputSectionOffset, disabled }) => {
 						>
 							<i className="text-2xl bx bxs-smile text-primary"></i>
 						</button>
+
 						{isIconPickerOpened && (
-							<ClickAway handleClickAway={() => setIsIconPickerOpened(false)}>
-								{(ref) => (
-									<div ref={ref} className="absolute right-0 bottom-full">
-										<Suspense
-											fallback={
-												<div className="flex h-[357px] w-[348px] items-center justify-center rounded-lg border-2 border-[#555453] bg-[#222222]">
-													<Spin />
-												</div>
-											}
-										>
-											<Picker onEmojiSelect={(emoji) => handleAddIconToInput(emoji)} />
-										</Suspense>
-									</div>
-								)}
-							</ClickAway>
+							<IconPicker
+								setIsIconPickerOpened={setIsIconPickerOpened}
+								setInputValue={setInputValue}
+								textInputRef={textInputRef}
+							></IconPicker>
 						)}
 					</div>
 					{fileUploading ? (
