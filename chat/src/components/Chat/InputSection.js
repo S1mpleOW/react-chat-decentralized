@@ -129,7 +129,7 @@ const InputSection = ({ setInputSectionOffset, disabled }) => {
 		}
 		
 		const message = e.target.elements['messages']?.value;
-		if (message) setGun(gun, 'messages-room1', message, '1', '2')
+		if (message) setGun(gun, 'messages-room1', {type: 'msg', content: message} , '1', '2')
 
 		setInputValue('')
 	};
