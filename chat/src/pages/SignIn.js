@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Field from '../components/Authen/Field';
 import Input from '../components/Authen/Input';
 import Label from '../components/Authen/Label';
@@ -22,6 +22,7 @@ const schema = yup.object().shape({
 });
 
 const SignIn = () => {
+	const [ authErr, setAuthErr ] = useState('')
 
 	const {
 		control,
@@ -36,19 +37,24 @@ const SignIn = () => {
 		},
 		resolver: yupResolver(schema),
 	});
-
+	console.log(authErr)
 	const onSubmit = (data) => {
-    	console.log("🚀 ~ file: SignIn.js ~ line 43 ~ onSubmit ~ data", data)
 		
 		user.auth(data.username, data.password, (ack) => {
 			if(ack.err) {
-				alert(`LOGIN FAILED \n${ack.err}`)
+				setAuthErr(ack.err)
 				return
 			}
-            console.log("🚀 ~ file: SignIn.js ~ line 44 ~ user.auth ~ ack", ack)
-			console.log('public key user login creates: ', ack.sea.pub)
+            
+			const userInfo = {
+				userName: data.username,
+				userId: ack.id,
+				userPub: ack.sea.pub, //public key
+				userPri: ack.sea.priv //private key
+			}
+
+            console.log("🚀 ~ file: SignIn.js ~ line 55 ~ user.auth ~ userInfo", userInfo)
 			
-			// console.log(user)
 		})
 		
 	};
@@ -78,6 +84,9 @@ const SignIn = () => {
 						</span>
 					)}
 				</Field>
+				{authErr ? <div className="text-base font-bold text-red-500">
+					{authErr}
+				</div>:''}
 				<Field className="field">
 					<div className="flex gap-2 ml-auto">
 						<span>Doesn't have any account?</span>
@@ -88,6 +97,7 @@ const SignIn = () => {
 						</NavLink>
 					</div>
 				</Field>
+
 				<Button
 					type="submit"
 					style={{

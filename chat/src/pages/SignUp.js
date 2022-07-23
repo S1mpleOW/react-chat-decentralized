@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import Field from '../components/Authen/Field';
 import Input from '../components/Authen/Input';
 import Label from '../components/Authen/Label';
@@ -24,6 +24,8 @@ const schema = yup.object().shape({
 });
 
 const SignUp = () => {
+	const [ createErr, setCreateErr ] = useState('')
+
 	const {
 		control,
 		handleSubmit,
@@ -43,7 +45,7 @@ const SignUp = () => {
     	console.log("🚀 ~ file: SignUp.js ~ line 43 ~ onSubmit ~ data", data)
 		
 		user.create(data.username, data.password, ({ err }) => {
-            if(err) alert(`SIGN UP FAILED \n${err}`)
+            if(err) setCreateErr(err)
             
         })
 		
