@@ -1,11 +1,9 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { useDarkmode } from '../contexts/darkmodeContext';
 import ClickAway from '../pattern/renderProps/ClickAway';
 import CreateConversation from './Home/CreateConversation';
 import SelectConversation from './Home/SelectConversation';
 import UserInfo from './Home/UserInfo';
-import Toggle from './toggle/Toggle';
 const data = [
 	{
 		uid: '1',
@@ -64,7 +62,6 @@ const SideBar = () => {
 	const [createConversationOpened, setCreateConversationOpened] = useState(false);
 
 	const location = useLocation();
-	const { darkmode, setDarkmode } = useDarkmode();
 	return (
 		<div className="relative">
 			{/* <div className="absolute bottom-0 right-0 z-10 inline-block m-3 ">

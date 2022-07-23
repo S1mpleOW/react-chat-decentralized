@@ -5,7 +5,25 @@ import getIcon from '../../utils/constants';
 import { getFileName, toBase64, setGun, getFileType } from '../../utils/helper';
 import InputSendMessage from './InputSendMessage';
 import IconPicker from './IconPicker';
-import { gun } from '../../App';
+
+const pushAllFiles = (files) => {
+	let fileList = [];
+
+	files.map(async (file) => {
+		const extension = file.name.split('.').pop();
+		const base64File = await toBase64(file);
+		console.log({ type: getFileType(base64File), content: base64File, extension, name: file.name });
+		setGun({
+			room: 'messages-room1',
+			message: { type: getFileType(base64File), content: base64File, extension, name: file.name },
+			sender: '1',
+			receiver: '2',
+		});
+		fileList.push(base64File);
+	});
+
+	return fileList;
+};
 
 const InputSection = ({ setInputSectionOffset, disabled }) => {
 	const [fileDragging, setFileDragging] = useState(false);
@@ -35,6 +53,7 @@ const InputSection = ({ setInputSectionOffset, disabled }) => {
 		},
 		[previewFiles]
 	);
+
 	useEffect(() => {
 		textInputRef.current?.focus();
 	}, [conversationId]);
@@ -100,39 +119,34 @@ const InputSection = ({ setInputSectionOffset, disabled }) => {
 	///////////DIEN coded
 
 	const handleFileInputChange = async (e) => {
-		const uploadFiles = await e.target.files
-		setPreviewFiles(previewFiles => [...previewFiles,...uploadFiles]);
+		const uploadFiles = await e.target.files;
+		setPreviewFiles((previewFiles) => [...previewFiles, ...uploadFiles]);
 	};
-
-	const pushAllFiles = files => {
-		let fileList = [];
-
-		files.map(async (file) => {
-			const base64File = await toBase64(file);
-			console.log({type: getFileType(base64File), content: base64File})
-			setGun(gun, 'messages-room1', {type: getFileType(base64File), content: base64File}, '1', '2')
-			fileList.push(base64File);
-		})
-
-		return fileList;
-	}
 
 	const handleFormSubmit = (e) => {
 		e.preventDefault();
-		
-		///////////////DIEN coded
-		if(previewFiles.length > 0){
-			const files = [...previewFiles]
-			pushAllFiles(files)
-			
-			setPreviewFiles([])
-		}
-		
-		const message = e.target.elements['messages']?.value;
-		if (message) setGun(gun, 'messages-room1', {type: 'msg', content: message} , '1', '2')
 
-		setInputValue('')
+		///////////////DIEN coded
+		if (previewFiles.length > 0) {
+			const files = [...previewFiles];
+			pushAllFiles(files);
+
+			setPreviewFiles([]);
+		}
+
+		const message = e.target.elements['messages']?.value;
+		if (message) {
+			setGun({
+				room: 'messages-room1',
+				message: { type: 'message', content: message },
+				sender: '1',
+				receiver: '2',
+			});
+		}
+
+		setInputValue('');
 	};
+
 	const handlePaste = (e) => {
 		const files = e?.clipboardData?.files;
 		if (!files) return;
@@ -208,7 +222,7 @@ const InputSection = ({ setInputSectionOffset, disabled }) => {
 							application/pdf"
 					type="file"
 					onChange={handleFileInputChange}
-					id = "fileUploadHolder"
+					id="fileUploadHolder"
 					multiple
 				/>
 

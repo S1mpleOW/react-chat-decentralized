@@ -6,19 +6,30 @@ import Home from './pages/Home';
 import Main from './pages/Main';
 import SignIn from './pages/SignIn';
 import Gun from 'gun';
+import { useEffect } from 'react';
+import useDarkModeSetting from './store';
 export const gun = new Gun({
 	peers: ['http://localhost:4000/gun'],
 });
 
 function App() {
-	const { darkmode, setDarkmode } = useDarkmode();
+	const darkMode = useDarkModeSetting((state) => state.darkMode);
+	const toggleDarkMode = useDarkModeSetting((state) => state.toggleDarkMode);
+	useEffect(() => {
+		if (darkMode) {
+			document?.documentElement?.classList.add('dark');
+		} else {
+			console.log(darkMode);
+			document?.documentElement?.classList.remove('dark');
+		}
+	}, [darkMode]);
 	return (
 		<Routes>
 			<Route
 				element={
 					<>
 						<div className="absolute top-0 right-0 z-10 inline-block m-3 ">
-							<Toggle on={darkmode} onClick={() => setDarkmode(!darkmode)}></Toggle>
+							<Toggle on={darkMode} onClick={toggleDarkMode}></Toggle>
 						</div>
 						<Outlet />
 					</>

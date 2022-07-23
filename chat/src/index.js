@@ -3,15 +3,12 @@ import ReactDOM from 'react-dom/client';
 import App from './App';
 import { BrowserRouter } from 'react-router-dom';
 import './styles/index.css';
-import { DarkmodeProvider } from './contexts/darkmodeContext';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
 	<>
 		<BrowserRouter>
-			<DarkmodeProvider>
-				<App />
-			</DarkmodeProvider>
+			<App />
 		</BrowserRouter>
 	</>
 );

@@ -3,7 +3,7 @@ import { createContext, useContext, useEffect, useState } from 'react';
 const darkmodeContext = createContext();
 
 const DarkmodeProvider = (props) => {
-	const [darkmode, setDarkmode] = useState(true);
+	const [darkmode, setDarkmode] = useState(false);
 	useEffect(() => {
 		if (darkmode) {
 			document && document.documentElement && document.documentElement.classList.add('dark');

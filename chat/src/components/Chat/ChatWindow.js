@@ -22,12 +22,12 @@ const ChatWindow = ({ inputSectionOffset = 0 }) => {
 			.map()
 			.once((data, id) => {
 				if (data.length === 0) return;
-				const { sender, receiver, message, createdAt } = data;
+				const { sender, receiver, content, messageType, createdAt, name, extension } = data;
 				dispatch({
 					type: 'GET_MESSAGES',
 					payload: {
 						id,
-						messages: { sender, message, receiver, createdAt },
+						messages: { sender, content, messageType, receiver, createdAt, name, extension },
 					},
 				});
 			});
@@ -35,7 +35,6 @@ const ChatWindow = ({ inputSectionOffset = 0 }) => {
 	}, []);
 
 	const size = messages && messages.length;
-	console.log('mess: ', messages)
 	return (
 		<InfiniteScroll
 			next={() => setLimitCount((prev) => prev + 10)}
@@ -53,35 +52,25 @@ const ChatWindow = ({ inputSectionOffset = 0 }) => {
 			<div className="flex flex-col items-stretch pt-4 pb-1">
 				{messages &&
 					messages.length > 0 &&
-					messages.map((message, id) => {
-						if (message.sender === '1') {
-							return <RightMessage key={id} message={message?.message} />;
+					messages.map((data, id) => {
+						if (data.sender === '1') {
+							return (
+								<RightMessage
+									key={id}
+									message={{
+										type: data.messageType,
+										content: data.content,
+										name: data.name,
+										extension: data.extension,
+									}}
+								/>
+							);
 						} else {
-							return <LeftMessage key={id} message={message?.message} />;
+							return (
+								<LeftMessage key={id} message={{ type: data.messageType, content: data.content }} />
+							);
 						}
 					})}
-				{/* <LeftMessage message="Hello" />
-				<RightMessage message="Hello" />
-				<LeftMessage message="Hello" />
-				<RightMessage message="Hello" />
-				<LeftMessage message="Hello" />
-				<RightMessage message="Hello" />
-				<LeftMessage message="Hello" />
-				<RightMessage message="Hello" />
-				<LeftMessage message="Hello" />
-				<RightMessage message="Hello" />
-				<LeftMessage message="Hello" />
-				<RightMessage message="Hello" />
-				<LeftMessage message="Hello" />
-				<RightMessage message="Hello" />
-				<LeftMessage message="Hello" />
-				<RightMessage message="Hello" />
-				<LeftMessage message="Hello" />
-				<RightMessage message="Hello" />
-				<LeftMessage message="Hello" />
-				<RightMessage message="Hello" />
-				<RightMessage message="Hello" />
-				<RightMessage message="Hello" /> */}
 
 				{/* {Object.entries(conversation.seen).filter(
 							([key, value]) => key !== currentUser?.uid && value === item.id

@@ -1,6 +1,6 @@
 import React from 'react';
 
-const LeftMessage = ({ message }) => {
+const LeftMessage = ({ content = '', type }) => {
 	return (
 		<div className="relative flex items-stretch gap-2 px-8 mb-2 group">
 			<div
@@ -8,7 +8,7 @@ const LeftMessage = ({ message }) => {
 				className={`bg-dark-lighten rounded-lg p-2 text-white 
 						 after:border-dark-lighten relative after:absolute after:right-full after:bottom-[6px] after:border-8 after:border-t-transparent after:border-l-transparent`}
 			>
-				<span>{message || ''}</span>
+				<span>{content || ''}</span>
 			</div>
 		</div>
 	);
