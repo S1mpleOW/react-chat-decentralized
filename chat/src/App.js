@@ -5,11 +5,12 @@ import ChatRoom from './pages/ChatRoom';
 import Home from './pages/Home';
 import Main from './pages/Main';
 import SignIn from './pages/SignIn';
+import SignUp from './pages/SignUp';
 import Gun from 'gun';
 import { useEffect } from 'react';
 import useDarkModeSetting from './store';
 export const gun = new Gun({
-	peers: ['http://localhost:4000/gun'],
+	peers: ['http://localhost:8765/gun'],
 });
 
 function App() {
@@ -40,6 +41,7 @@ function App() {
 					<Route path="/chat/:id" element={<ChatRoom />}></Route>
 				</Route>
 				<Route path="/sign-in" element={<SignIn />}></Route>
+				<Route path="/sign-up" element={<SignUp />}></Route>
 			</Route>
 		</Routes>
 	);

@@ -2,7 +2,7 @@ const Gun = require('gun');
 const express = require('express');
 
 const app = express();
-const port = 4000;
+const port = 8765;
 app.use(Gun.serve);
 
 const server = app.listen(port, () => {

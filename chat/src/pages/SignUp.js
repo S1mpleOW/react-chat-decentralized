@@ -19,10 +19,11 @@ const schema = yup.object().shape({
 		.string()
 		.min(8, 'Password must be at least 8 characters')
 		.required('Password is required'),
+    re_password: yup.string()
+        .oneOf([yup.ref('password'), null], 'Passwords must match')
 });
 
-const SignIn = () => {
-
+const SignUp = () => {
 	const {
 		control,
 		handleSubmit,
@@ -33,23 +34,18 @@ const SignIn = () => {
 		defaultValues: {
 			username: '',
 			password: '',
+            re_pass : ''
 		},
 		resolver: yupResolver(schema),
 	});
 
 	const onSubmit = (data) => {
-    	console.log("🚀 ~ file: SignIn.js ~ line 43 ~ onSubmit ~ data", data)
+    	console.log("🚀 ~ file: SignUp.js ~ line 43 ~ onSubmit ~ data", data)
 		
-		user.auth(data.username, data.password, (ack) => {
-			if(ack.err) {
-				alert(`LOGIN FAILED \n${ack.err}`)
-				return
-			}
-            console.log("🚀 ~ file: SignIn.js ~ line 44 ~ user.auth ~ ack", ack)
-			console.log('public key user login creates: ', ack.sea.pub)
-			
-			// console.log(user)
-		})
+		user.create(data.username, data.password, ({ err }) => {
+            if(err) alert(`SIGN UP FAILED \n${err}`)
+            
+        })
 		
 	};
 
@@ -69,6 +65,7 @@ const SignIn = () => {
 						<span className="text-base font-bold text-red-500">{errors?.username?.message || ''}</span>
 					)}
 				</Field>
+
 				<Field className="field">
 					<Label htmlFor="password">Password</Label>
 					<InputPassword control={control}></InputPassword>
@@ -78,12 +75,28 @@ const SignIn = () => {
 						</span>
 					)}
 				</Field>
+
+                <Field className="field">
+					<Label htmlFor="password">Reenter password</Label>
+					<InputPassword 
+                        name="re_password"
+                        id="re_password"
+                        control={control}
+                    >
+                    </InputPassword>
+					{errors && errors.re_password && (
+						<span className="text-base font-bold text-red-500">
+							{errors?.re_password?.message || ''}
+						</span>
+					)}
+				</Field>
+
 				<Field className="field">
 					<div className="flex gap-2 ml-auto">
-						<span>Doesn't have any account?</span>
-						<NavLink to={`/sign-up`}>
+						<span>Already registerd ?</span>
+						<NavLink to={`/sign-in`}>
 							<div className="transition-all text-green-primary hover:text-dark-green-lighter">
-								Register
+								Sign in
 							</div>
 						</NavLink>
 					</div>
@@ -97,11 +110,11 @@ const SignIn = () => {
 					}}
 					isLoading={isSubmitting}
 				>
-					Sign in
+					Create new account
 				</Button>
 			</form>
 		</Authen>
 	);
 };
 
-export default SignIn;
+export default SignUp;
