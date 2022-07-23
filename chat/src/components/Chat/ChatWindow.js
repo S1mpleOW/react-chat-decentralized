@@ -14,7 +14,7 @@ const ChatWindow = ({ inputSectionOffset = 0 }) => {
 		state: { messages },
 		dispatch,
 	} = useMessageContext();
-
+	console.log(messages);
 	useEffect(() => {
 		if (!conversationId) return;
 		gun

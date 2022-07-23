@@ -45,3 +45,11 @@ export const getFileType = (fileBase64) => {
 	//pdf, document, sheet
 	//png, png, ...
 };
+
+export const isFileOrImage = (extension) => {
+	if (!extension) return 'message';
+	if (extension === 'png' || extension === 'jpg' || extension === 'jpeg') {
+		return 'image';
+	}
+	return 'file';
+};
