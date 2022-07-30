@@ -1,6 +1,9 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { gun } from '../App';
+import { user } from '../auth';
 import ClickAway from '../pattern/renderProps/ClickAway';
+import { useUserStore } from '../store';
 import CreateConversation from './Home/CreateConversation';
 import SelectConversation from './Home/SelectConversation';
 import UserInfo from './Home/UserInfo';
@@ -60,13 +63,41 @@ const SideBar = () => {
 	const [isDropdownOpened, setIsDropdownOpened] = useState(false);
 	const [isUserInfoOpened, setIsUserInfoOpened] = useState(false);
 	const [createConversationOpened, setCreateConversationOpened] = useState(false);
+	const [data, setData] = useState([]);
+	const { user: accountHolder, setUser } = useUserStore();
+	useEffect(() => {
+		gun
+			.get('conversations')
+			.get(accountHolder.userPub)
+			.map()
+			.once((conversation) => {
+				const conversationId = conversation && conversation['_']['#'].split('/')[1];
+				if (conversationId) {
+					gun
+						.get('users')
+						.get(conversationId)
+						.map()
+						.once((receiver) => {
+							if (receiver) {
+								console.log(receiver);
+								// setData((prev) => [
+								// 	...prev,
+								// 	{
+								// 		uid: receiver.pubKey,
+								// 		displayName: receiver.name,
+								// 		photoURL: `${process.env.REACT_APP_AVATAR}/${receiver.name}.svg`,
+								// 	},
+								// ]);
+							}
+						});
+				}
+			});
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, []);
 
 	const location = useLocation();
 	return (
 		<div className="relative">
-			{/* <div className="absolute bottom-0 right-0 z-10 inline-block m-3 ">
-				<Toggle on={darkmode} onClick={() => setDarkmode(!darkmode)}></Toggle>
-			</div> */}
 			<div
 				className={`border-dark-green dark:border-dark-green-lighter h-screen flex-shrink-0 overflow-y-auto overflow-x-hidden border-r flex flex-col relative ${
 					location.pathname !== '/' ? 'hidden w-[350px] md:!block' : 'w-full md:!w-[350px]'
@@ -92,12 +123,18 @@ const SideBar = () => {
 									<img
 										onClick={() => setIsDropdownOpened((prev) => !prev)}
 										className="object-cover w-8 h-8 rounded-full cursor-pointer"
-										// src={currentUser?.photoURL ? IMAGE_PROXY(currentUser.photoURL) : DEFAULT_AVATAR}
-										src="https://source.unsplash.com/random"
+										src={
+											accountHolder
+												? `${process.env.REACT_APP_AVATAR}/${accountHolder?.userName?.slice(
+														0,
+														2
+												  )}.svg`
+												: 'https://avatars.dicebear.com/api/bottts/123.svg'
+										}
 										alt="avatar"
 									/>
 									<div
-										className={`border-dark-green dark:border-dark-green-lighter bg-light-lighten dark:bg-dark absolute top-[calc(100%+10px)] right-0 flex w-max origin-top-right flex-col items-stretch overflow-hidden rounded-md border  shadow-lg transition-all duration-200 ${
+										className={`border-dark-green dark:border-dark-green-lighter bg-light-lighten dark:bg-dark absolute top-[calc(100%+10px)] right-0 flex w-max origin-top-right flex-col items-stretch overflow-hidden rounded-md border shadow-lg transition-all duration-200 ${
 											isDropdownOpened
 												? 'visible scale-100 opacity-100'
 												: 'invisible scale-0 opacity-0'
@@ -114,7 +151,10 @@ const SideBar = () => {
 											<span className="whitespace-nowrap">Profile</span>
 										</button>
 										<button
-											// onClick={() => signOut(auth)}
+											onClick={() => {
+												user.leave();
+												setUser(null);
+											}}
 											className="flex items-center gap-1 px-3 py-2 transition duration-300 hover:bg-light dark:hover:bg-dark-lighten"
 										>
 											<i className="text-xl bx bx-log-out"></i>
@@ -159,6 +199,7 @@ const SideBar = () => {
 				<div className="flex flex-col">
 					{data.length > 0 &&
 						data.map((item) => {
+							console.log(item.uid);
 							return (
 								<SelectConversation
 									key={item.uid}

@@ -2,22 +2,23 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Spin } from 'react-cssfx-loading';
 import { useParams } from 'react-router-dom';
 import getIcon from '../../utils/constants';
-import { getFileName, toBase64, setGun, getFileType } from '../../utils/helper';
+import { getFileName, toBase64, setGunMessageRoom, getFileType } from '../../utils/helper';
 import InputSendMessage from './InputSendMessage';
 import IconPicker from './IconPicker';
+import { useUserStore } from '../../store';
 
-const pushAllFiles = (files) => {
+const pushAllFiles = (files, { sender, receiver }) => {
 	let fileList = [];
-
+	if (!sender || !receiver) return false;
 	files.map(async (file) => {
 		const extension = file.name.split('.').pop();
 		const base64File = await toBase64(file);
 		console.log({ type: getFileType(base64File), content: base64File, extension, name: file.name });
-		setGun({
+		setGunMessageRoom({
 			room: 'messages-room1',
 			message: { type: getFileType(base64File), content: base64File, extension, name: file.name },
-			sender: '1',
-			receiver: '2',
+			sender,
+			receiver,
 		});
 		fileList.push(base64File);
 	});
@@ -54,6 +55,8 @@ const InputSection = ({ setInputSectionOffset, disabled }) => {
 		[previewFiles]
 	);
 
+	const { user } = useUserStore();
+
 	useEffect(() => {
 		textInputRef.current?.focus();
 	}, [conversationId]);
@@ -84,7 +87,7 @@ const InputSection = ({ setInputSectionOffset, disabled }) => {
 
 			for (let i = 0, item; (item = items[i]); i++) {
 				let entry = item.webkitGetAsEntry();
-				if (entry.isFile) {
+				if (entry && entry.isFile) {
 					const isExisted = checkFileExists(files[i]);
 					if (!isExisted) {
 						selectedFiles.push(files[i]);
@@ -116,8 +119,6 @@ const InputSection = ({ setInputSectionOffset, disabled }) => {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [previewFiles.length]);
 
-	///////////DIEN coded
-
 	const handleFileInputChange = async (e) => {
 		const uploadFiles = await e.target.files;
 		setPreviewFiles((previewFiles) => [...previewFiles, ...uploadFiles]);
@@ -125,22 +126,24 @@ const InputSection = ({ setInputSectionOffset, disabled }) => {
 
 	const handleFormSubmit = (e) => {
 		e.preventDefault();
-
-		///////////////DIEN coded
+		const informationConversation = { sender: user?.userId, receiver: conversationId };
 		if (previewFiles.length > 0) {
 			const files = [...previewFiles];
-			pushAllFiles(files);
-
+			const isPushedFile = pushAllFiles(files, informationConversation);
+			if (isPushedFile) {
+				// notify success
+			} else {
+				// notify error
+			}
 			setPreviewFiles([]);
 		}
 
 		const message = e.target.elements['messages']?.value;
 		if (message) {
-			setGun({
+			setGunMessageRoom({
 				room: 'messages-room1',
 				message: { type: 'message', content: message },
-				sender: '1',
-				receiver: '2',
+				...informationConversation,
 			});
 		}
 
@@ -215,10 +218,10 @@ const InputSection = ({ setInputSectionOffset, disabled }) => {
 					ref={fileInputRef}
 					hidden
 					className="hidden"
-					accept="application/msword, 
-							application/vnd.ms-excel, 
+					accept="application/msword,
+							application/vnd.ms-excel,
 							application/vnd.ms-powerpoint,
-							text/plain, 
+							text/plain,
 							application/pdf"
 					type="file"
 					onChange={handleFileInputChange}
@@ -233,6 +236,11 @@ const InputSection = ({ setInputSectionOffset, disabled }) => {
 							disabled={disabled}
 							ref={textInputRef}
 							value={inputValue}
+							className={`${
+								disabled
+									? 'pointer-events-none cursor-not-allowed'
+									: 'pointer-events-auto cursor-text'
+							}`}
 							onChange={(e) => setInputValue(e.target.value)}
 							name="messages"
 							onPaste={handlePaste}

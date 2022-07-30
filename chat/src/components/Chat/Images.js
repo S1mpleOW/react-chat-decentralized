@@ -28,7 +28,7 @@ const Images = () => {
 			.get('messages-room1')
 			.map()
 			.once((data, id) => {
-				if (data.length === 0) return;
+				if (!data || data.length === 0) return;
 				const { messageType } = data;
 				data.id = id;
 				if (messageType === 'jpg' || messageType === 'png' || messageType === 'jpeg') {

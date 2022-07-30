@@ -15,6 +15,7 @@ module.exports = {
 				'gray-dark': '#eeeeee',
 				'green-primary': '#00A7B4',
 				'green-secondary': '#A4D96C',
+				'left-message': '#3e4042',
 				primary: 'var(--primary-color)',
 			},
 		},

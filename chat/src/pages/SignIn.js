@@ -10,8 +10,8 @@ import InputPassword from '../components/Authen/InputPassword';
 import { NavLink } from 'react-router-dom';
 import Button from '../components/Authen/Button';
 
-import { user } from '../auth'
-
+import { user } from '../auth';
+import { useUserStore } from '../store';
 
 const schema = yup.object().shape({
 	username: yup.string().required('Username is required'),
@@ -22,13 +22,12 @@ const schema = yup.object().shape({
 });
 
 const SignIn = () => {
-	const [ authErr, setAuthErr ] = useState('')
-
 	const {
 		control,
 		handleSubmit,
 		formState: { isSubmitting, isValid, errors },
 		reset,
+		setError,
 	} = useForm({
 		mode: 'onChange',
 		defaultValues: {
@@ -37,26 +36,28 @@ const SignIn = () => {
 		},
 		resolver: yupResolver(schema),
 	});
-	console.log(authErr)
+
+	const { setUser } = useUserStore();
+
 	const onSubmit = (data) => {
-		
 		user.auth(data.username, data.password, (ack) => {
-			if(ack.err) {
-				setAuthErr(ack.err)
-				return
+			console.log(ack);
+			if (ack.err) {
+				setError('password', {
+					message: ack.err,
+				});
+				return null;
 			}
-            
 			const userInfo = {
 				userName: data.username,
-				userId: ack.id,
-				userPub: ack.sea.pub, //public key
-				userPri: ack.sea.priv //private key
-			}
-
-            console.log("🚀 ~ file: SignIn.js ~ line 55 ~ user.auth ~ userInfo", userInfo)
-			
-		})
-		
+				userPub: ack?.sea?.pub, //public key
+				// userPri: ack?.sea?.priv, //private key
+			};
+			console.log('🚀 ~ file: SignIn.js ~ line 55 ~ user.auth ~ userInfo', userInfo);
+			reset({ username: '', password: '' });
+			setUser(userInfo);
+			return;
+		});
 	};
 
 	return (
@@ -72,7 +73,9 @@ const SignIn = () => {
 						control={control}
 					/>
 					{errors && errors.username && (
-						<span className="text-base font-bold text-red-500">{errors?.username?.message || ''}</span>
+						<span className="text-base font-bold text-red-500">
+							{errors?.username?.message || ''}
+						</span>
 					)}
 				</Field>
 				<Field className="field">
@@ -84,9 +87,6 @@ const SignIn = () => {
 						</span>
 					)}
 				</Field>
-				{authErr ? <div className="text-base font-bold text-red-500">
-					{authErr}
-				</div>:''}
 				<Field className="field">
 					<div className="flex gap-2 ml-auto">
 						<span>Doesn't have any account?</span>
@@ -105,6 +105,7 @@ const SignIn = () => {
 						margin: '0 auto',
 						height: '66px',
 					}}
+					disabled={!isValid || isSubmitting}
 					isLoading={isSubmitting}
 				>
 					Sign in

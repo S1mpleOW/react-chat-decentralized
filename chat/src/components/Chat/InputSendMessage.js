@@ -1,7 +1,17 @@
 import React, { forwardRef } from 'react';
 
 const InputSendMessage = (
-	{ name = '', control, id, type = 'text', placeholder = '', children, className, value, ...props },
+	{
+		name = '',
+		control,
+		id,
+		type = 'text',
+		placeholder = '',
+		children,
+		className = '',
+		value,
+		...props
+	},
 	ref
 ) => {
 	return (

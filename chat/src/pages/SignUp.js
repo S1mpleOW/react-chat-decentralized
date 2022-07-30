@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import Field from '../components/Authen/Field';
 import Input from '../components/Authen/Input';
 import Label from '../components/Authen/Label';
@@ -10,8 +10,8 @@ import InputPassword from '../components/Authen/InputPassword';
 import { NavLink } from 'react-router-dom';
 import Button from '../components/Authen/Button';
 
-import { user } from '../auth'
-
+import { user } from '../auth';
+import { setGunUsers } from '../utils/helper';
 
 const schema = yup.object().shape({
 	username: yup.string().required('Username is required'),
@@ -19,36 +19,47 @@ const schema = yup.object().shape({
 		.string()
 		.min(8, 'Password must be at least 8 characters')
 		.required('Password is required'),
-    re_password: yup.string()
-        .oneOf([yup.ref('password'), null], 'Passwords must match')
+	passwordConfirm: yup.string().oneOf([yup.ref('password'), null], 'Passwords must match'),
 });
 
 const SignUp = () => {
-	const [ createErr, setCreateErr ] = useState('')
-
 	const {
 		control,
 		handleSubmit,
 		formState: { isSubmitting, isValid, errors },
 		reset,
+		setError,
 	} = useForm({
 		mode: 'onChange',
 		defaultValues: {
 			username: '',
 			password: '',
-            re_pass : ''
+			passwordConfirm: '',
 		},
 		resolver: yupResolver(schema),
 	});
 
 	const onSubmit = (data) => {
-    	console.log("🚀 ~ file: SignUp.js ~ line 43 ~ onSubmit ~ data", data)
-		
-		user.create(data.username, data.password, ({ err }) => {
-            if(err) setCreateErr(err)
-            
-        })
-		
+		console.log('🚀 ~ file: SignUp.js ~ line 43 ~ onSubmit ~ data', data);
+
+		user.create(data.username, data.password, (ack) => {
+			console.log(ack);
+			if (ack.err) {
+				setError('passwordConfirm', {
+					message: ack.err,
+				});
+				return;
+			}
+			const user = {
+				name: data.username,
+				pubKey: ack.pub,
+				isOnline: false,
+			};
+			setGunUsers(user);
+
+			reset({ username: '', password: '', passwordConfirm: '' });
+			return;
+		});
 	};
 
 	return (
@@ -64,7 +75,9 @@ const SignUp = () => {
 						control={control}
 					/>
 					{errors && errors.username && (
-						<span className="text-base font-bold text-red-500">{errors?.username?.message || ''}</span>
+						<span className="text-base font-bold text-red-500">
+							{errors?.username?.message || ''}
+						</span>
 					)}
 				</Field>
 
@@ -78,17 +91,16 @@ const SignUp = () => {
 					)}
 				</Field>
 
-                <Field className="field">
+				<Field className="field">
 					<Label htmlFor="password">Reenter password</Label>
-					<InputPassword 
-                        name="re_password"
-                        id="re_password"
-                        control={control}
-                    >
-                    </InputPassword>
-					{errors && errors.re_password && (
+					<InputPassword
+						name="passwordConfirm"
+						id="passwordConfirm"
+						control={control}
+					></InputPassword>
+					{errors && errors.passwordConfirm && (
 						<span className="text-base font-bold text-red-500">
-							{errors?.re_password?.message || ''}
+							{errors?.passwordConfirm?.message || ''}
 						</span>
 					)}
 				</Field>
@@ -110,6 +122,7 @@ const SignUp = () => {
 						margin: '0 auto',
 						height: '66px',
 					}}
+					disabled={isSubmitting || !isValid}
 					isLoading={isSubmitting}
 				>
 					Create new account

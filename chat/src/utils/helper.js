@@ -18,7 +18,7 @@ export const toBase64 = (file) =>
 		reader.onerror = (error) => reject(error);
 	});
 
-export const setGun = ({
+export const setGunMessageRoom = ({
 	room,
 	message: { content, type = 'message', name = '', extension = '' },
 	sender,
@@ -32,6 +32,14 @@ export const setGun = ({
 		name,
 		extension,
 		createdAt: Date.now(),
+	});
+};
+
+export const setGunUsers = ({ name = '', isOnline = false, pubKey = '' }) => {
+	gun.get('users').get(pubKey).set({
+		name,
+		isOnline,
+		pubKey,
 	});
 };
 

@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import ClickAway from '../../pattern/renderProps/ClickAway';
 import PortalLayout from '../PortalLayout';
 import Skeleton from '../skeleton/Skeleton';
 import ConversationSetting from './ConversationSetting';
