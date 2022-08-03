@@ -32,6 +32,15 @@ export const setGunMessageRoom = ({
 		extension,
 		createdAt: Date.now(),
 	});
+	gun.get(`conversations`).get(receiver).get(sender).get('messages').set({
+		sender,
+		content,
+		messageType: type,
+		receiver,
+		name,
+		extension,
+		createdAt: Date.now(),
+	});
 };
 
 export const setGunUsers = ({ name = '', isOnline = false, pubKey = '' }) => {

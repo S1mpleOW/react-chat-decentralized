@@ -27,19 +27,18 @@ const ChatWindow = ({ inputSectionOffset = 0 }) => {
 			.get('messages')
 			.map()
 			.once((data, id) => {
+				console.log(data);
 				if (!data || data.length === 0) {
 					return;
 				}
 				const { sender, receiver, content, messageType, createdAt, name, extension } = data;
-				if (conversationId?.id === receiver) {
-					dispatch({
-						type: 'GET_MESSAGES',
-						payload: {
-							id,
-							messages: { sender, content, messageType, receiver, createdAt, name, extension },
-						},
-					});
-				}
+				dispatch({
+					type: 'GET_MESSAGES',
+					payload: {
+						id,
+						messages: { sender, content, messageType, receiver, createdAt, name, extension },
+					},
+				});
 			});
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [conversationId]);

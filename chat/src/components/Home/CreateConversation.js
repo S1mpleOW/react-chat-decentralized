@@ -62,18 +62,23 @@ const CreateConversation = ({ handleClickAway }) => {
 				.once((conversation) => {
 					if (conversation) {
 						isExisted = true;
-						console.log(conversation);
 					}
 				});
 			if (isExisted) {
 				navigate(`/chat/${selected[0]}`);
 				return;
 			}
-			accountHolder &&
-				gun.get('conversations').get(accountHolder.userPub).get(selected[0]).set({
+			if (accountHolder) {
+				gun.get('conversations').get(accountHolder?.userPub).get(selected[0]).set({
 					isCreated: Date.now(),
 					isRemoved: false,
 				});
+				gun.get('conversations').get(selected[0]).get(accountHolder?.userPub).set({
+					isCreated: Date.now(),
+					isRemoved: false,
+				});
+			}
+
 			navigate(`/chat/${selected[0]}`);
 			setIsLoading(false);
 			setSelected([]);
