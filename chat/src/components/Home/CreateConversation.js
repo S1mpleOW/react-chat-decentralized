@@ -3,39 +3,23 @@ import { Spin } from 'react-cssfx-loading';
 import { useNavigate } from 'react-router-dom';
 import { gun } from '../../App';
 import { useUserStore } from '../../store';
-// const data = [
-// 	{
-// 		uid: '1',
-// 		displayName: 'John Doe',
-// 		photoURL: `${process.env.REACT_APP_AVATAR}/jd.svg`,
-// 	},
-// 	{
-// 		uid: '2',
-// 		displayName: 'John Smith',
-// 		photoURL: `${process.env.REACT_APP_AVATAR}/js.svg`,
-// 	},
-// 	{
-// 		uid: '3',
-// 		displayName: 'Karol Smith',
-// 		photoURL: `${process.env.REACT_APP_AVATAR}/ks.svg`,
-// 	},
-// ];
 
 const CreateConversation = ({ handleClickAway }) => {
 	const [isLoading, setIsLoading] = useState(false);
 	const [selected, setSelected] = useState([]);
 	const [data, setData] = useState([]);
-	const { accountHolder } = useUserStore();
-	console.log(selected);
+	const { user: accountHolder } = useUserStore();
 	useEffect(() => {
 		setIsLoading(true);
 		if (accountHolder) {
+			console.log(accountHolder.userPub);
 			gun
 				.get('users')
 				.map()
 				.once((user) => {
-					const userId = user['_']['#'].split('/')[1];
-					if (userId) {
+					const userId = user && user['_']['#'].split('/')[1];
+					console.log(userId);
+					if (userId !== accountHolder.userPub) {
 						const userData = gun
 							.get(`users`)
 							.get(userId)
@@ -66,14 +50,30 @@ const CreateConversation = ({ handleClickAway }) => {
 		}
 	};
 	const navigate = useNavigate();
-
+	console.log(selected);
 	const handleCreateConversation = () => {
 		setIsLoading(true);
+		let isExisted = false;
 		if (selected && selected.length === 1) {
-			gun.get('conversations').get(accountHolder.userPub).get(selected[0]).set({
-				isCreated: Date.now(),
-				isRemoved: false,
-			});
+			gun
+				.get('conversations')
+				.get(accountHolder?.userPub)
+				.get(selected[0])
+				.once((conversation) => {
+					if (conversation) {
+						isExisted = true;
+						console.log(conversation);
+					}
+				});
+			if (isExisted) {
+				navigate(`/chat/${selected[0]}`);
+				return;
+			}
+			accountHolder &&
+				gun.get('conversations').get(accountHolder.userPub).get(selected[0]).set({
+					isCreated: Date.now(),
+					isRemoved: false,
+				});
 			navigate(`/chat/${selected[0]}`);
 			setIsLoading(false);
 			setSelected([]);
@@ -103,7 +103,7 @@ const CreateConversation = ({ handleClickAway }) => {
 				) : (
 					<>
 						<div className="flex flex-col items-stretch gap-2 py-2 overflow-y-auto h-96">
-							{data.length > 0 ? (
+							{data?.length > 0 ? (
 								data.map((doc) => (
 									<div
 										key={doc.uid}

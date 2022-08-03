@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Spin } from 'react-cssfx-loading';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { useParams } from 'react-router-dom';
@@ -16,24 +16,33 @@ const ChatWindow = ({ inputSectionOffset = 0 }) => {
 		state: { messages },
 		dispatch,
 	} = useMessageContext();
+
 	useEffect(() => {
 		if (!conversationId || !user) return;
+		dispatch({ type: 'CLEAR_MESSAGES' });
 		gun
-			.get('messages-room1')
+			.get('conversations')
+			.get(user?.userPub)
+			.get(conversationId?.id)
+			.get('messages')
 			.map()
 			.once((data, id) => {
-				if (!data || data.length === 0) return;
+				if (!data || data.length === 0) {
+					return;
+				}
 				const { sender, receiver, content, messageType, createdAt, name, extension } = data;
-				dispatch({
-					type: 'GET_MESSAGES',
-					payload: {
-						id,
-						messages: { sender, content, messageType, receiver, createdAt, name, extension },
-					},
-				});
+				if (conversationId?.id === receiver) {
+					dispatch({
+						type: 'GET_MESSAGES',
+						payload: {
+							id,
+							messages: { sender, content, messageType, receiver, createdAt, name, extension },
+						},
+					});
+				}
 			});
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, []);
+	}, [conversationId]);
 
 	const size = messages && messages.length;
 	console.log(messages);
@@ -55,8 +64,7 @@ const ChatWindow = ({ inputSectionOffset = 0 }) => {
 				{messages &&
 					messages.length > 0 &&
 					messages.map((data, id) => {
-						if (`${data?.sender}` === `${user?.userId}`) {
-							console.log(user);
+						if (`${data?.sender}` === `${user?.userPub}`) {
 							return (
 								<RightMessage
 									key={id}

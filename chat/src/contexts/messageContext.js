@@ -12,6 +12,8 @@ const reducer = (state, dispatch) => {
 				newMessages = newMessages.sort((a, b) => (a.createdAt >= b.createdAt ? 1 : -1));
 				return { messages: newMessages };
 			}
+		case 'CLEAR_MESSAGES':
+			return { messages: [] };
 		case 'REMOVE_MESSAGE':
 			return state.filter((message) => message.id !== dispatch.payload);
 		default:

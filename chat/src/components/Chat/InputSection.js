@@ -126,7 +126,7 @@ const InputSection = ({ setInputSectionOffset, disabled }) => {
 
 	const handleFormSubmit = (e) => {
 		e.preventDefault();
-		const informationConversation = { sender: user?.userId, receiver: conversationId };
+		const informationConversation = { sender: user?.userPub, receiver: conversationId?.id };
 		if (previewFiles.length > 0) {
 			const files = [...previewFiles];
 			const isPushedFile = pushAllFiles(files, informationConversation);
@@ -141,7 +141,6 @@ const InputSection = ({ setInputSectionOffset, disabled }) => {
 		const message = e.target.elements['messages']?.value;
 		if (message) {
 			setGunMessageRoom({
-				room: 'messages-room1',
 				message: { type: 'message', content: message },
 				...informationConversation,
 			});

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Spin } from 'react-cssfx-loading';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { gun } from '../App';
 import { user } from '../auth';
 import ClickAway from '../pattern/renderProps/ClickAway';
@@ -7,93 +8,53 @@ import { useUserStore } from '../store';
 import CreateConversation from './Home/CreateConversation';
 import SelectConversation from './Home/SelectConversation';
 import UserInfo from './Home/UserInfo';
-const data = [
-	{
-		uid: '1',
-		displayName: 'John Doe',
-		photoURL: `https://randomuser.me/api/portraits/men/${Math.ceil(Math.random() * 100)}.jpg`,
-	},
-	{
-		uid: '2',
-		displayName: 'John Smith',
-		photoURL: `https://randomuser.me/api/portraits/men/${Math.ceil(Math.random() * 100)}.jpg`,
-	},
-	{
-		uid: '3',
-		displayName: 'Karol Smith',
-		photoURL: `https://randomuser.me/api/portraits/men/${Math.ceil(Math.random() * 100)}.jpg`,
-	},
-	// {
-	// 	uid: '4',
-	// 	displayName: 'Karol Smith',
-	// 	photoURL: `https://randomuser.me/api/portraits/men/${Math.ceil(Math.random() * 100)}.jpg`,
-	// },
-	// {
-	// 	uid: '5',
-	// 	displayName: 'Karol Smith',
-	// 	photoURL: `https://randomuser.me/api/portraits/men/${Math.ceil(Math.random() * 100)}.jpg`,
-	// },
-	// {
-	// 	uid: '6',
-	// 	displayName: 'Karol Smith',
-	// 	photoURL: `https://randomuser.me/api/portraits/men/${Math.ceil(Math.random() * 100)}.jpg`,
-	// },
-	// {
-	// 	uid: '7',
-	// 	displayName: 'Karol Smith',
-	// 	photoURL: `https://randomuser.me/api/portraits/men/${Math.ceil(Math.random() * 100)}.jpg`,
-	// },
-	// {
-	// 	uid: '8',
-	// 	displayName: 'Karol Smith',
-	// 	photoURL: `https://randomuser.me/api/portraits/men/${Math.ceil(Math.random() * 100)}.jpg`,
-	// },
-	// {
-	// 	uid: '9',
-	// 	displayName: 'Karol Smith',
-	// 	photoURL: `https://randomuser.me/api/portraits/men/${Math.ceil(Math.random() * 100)}.jpg`,
-	// },
-	// {
-	// 	uid: '10',
-	// 	displayName: 'Karol Smith',
-	// 	photoURL: `https://randomuser.me/api/portraits/men/${Math.ceil(Math.random() * 100)}.jpg`,
-	// },
-];
+
 const SideBar = () => {
+	const [data, setData] = useState([]);
 	const [isDropdownOpened, setIsDropdownOpened] = useState(false);
 	const [isUserInfoOpened, setIsUserInfoOpened] = useState(false);
 	const [createConversationOpened, setCreateConversationOpened] = useState(false);
-	const [data, setData] = useState([]);
+	const [loading, setLoading] = useState(false);
 	const { user: accountHolder, setUser } = useUserStore();
+	const navigate = useNavigate();
+	const handleSignOut = () => {
+		user.leave();
+		setUser(null);
+		navigate('/');
+	};
 	useEffect(() => {
-		gun
-			.get('conversations')
-			.get(accountHolder.userPub)
-			.map()
-			.once((conversation) => {
-				const conversationId = conversation && conversation['_']['#'].split('/')[1];
-				if (conversationId) {
-					gun
-						.get('users')
-						.get(conversationId)
-						.map()
-						.once((receiver) => {
-							if (receiver) {
-								console.log(receiver);
-								// setData((prev) => [
-								// 	...prev,
-								// 	{
-								// 		uid: receiver.pubKey,
-								// 		displayName: receiver.name,
-								// 		photoURL: `${process.env.REACT_APP_AVATAR}/${receiver.name}.svg`,
-								// 	},
-								// ]);
-							}
-						});
-				}
-			});
+		setLoading(true);
+		if (accountHolder.userPub) {
+			gun
+				.get('conversations')
+				.get(accountHolder?.userPub)
+				.map()
+				.once((conversation) => {
+					console.log(conversation);
+					const conversationId = conversation && conversation['_']['#'].split('/')[2];
+					if (conversationId) {
+						gun
+							.get('users')
+							.get(conversationId)
+							.map()
+							.once((receiver) => {
+								if (receiver) {
+									setData((prev) => [
+										...prev,
+										{
+											uid: receiver.pubKey,
+											displayName: receiver.name,
+											photoURL: `${process.env.REACT_APP_AVATAR}/${receiver.name}.svg`,
+										},
+									]);
+								}
+							});
+					}
+				});
+		}
+		setLoading(false);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, []);
+	}, [accountHolder.userPub]);
 
 	const location = useLocation();
 	return (
@@ -151,10 +112,7 @@ const SideBar = () => {
 											<span className="whitespace-nowrap">Profile</span>
 										</button>
 										<button
-											onClick={() => {
-												user.leave();
-												setUser(null);
-											}}
+											onClick={handleSignOut}
 											className="flex items-center gap-1 px-3 py-2 transition duration-300 hover:bg-light dark:hover:bg-dark-lighten"
 										>
 											<i className="text-xl bx bx-log-out"></i>
@@ -196,20 +154,35 @@ const SideBar = () => {
 				))}
 			</div>
 		)} */}
-				<div className="flex flex-col">
-					{data.length > 0 &&
-						data.map((item) => {
-							console.log(item.uid);
-							return (
-								<SelectConversation
-									key={item.uid}
-									photoURL={item.photoURL}
-									name={item.displayName}
-									conversationId={item.uid}
-								></SelectConversation>
-							);
-						})}
-				</div>
+				{loading ? (
+					<div className="flex justify-center my-6">
+						<Spin />
+					</div>
+				) : data?.length === 0 ? (
+					<div className="flex flex-col items-center justify-center my-6">
+						<p className="text-center">No conversation found</p>
+						<button
+							onClick={() => setCreateConversationOpened(true)}
+							className="text-center text-primary"
+						>
+							Create one
+						</button>
+					</div>
+				) : (
+					<div className="flex flex-col">
+						{data?.length > 0 &&
+							data.map((item) => {
+								return (
+									<SelectConversation
+										key={item.uid}
+										photoURL={item.photoURL}
+										name={item.displayName}
+										conversationId={item.uid}
+									></SelectConversation>
+								);
+							})}
+					</div>
+				)}
 			</div>
 
 			{createConversationOpened && (

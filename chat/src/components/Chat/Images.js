@@ -21,7 +21,6 @@ const Image = ({ src = '' }) => {
 const Images = () => {
 	const conversationId = useParams();
 	const [images, setImages] = React.useState([]);
-	console.log(images);
 	useEffect(() => {
 		if (!conversationId) return;
 		gun

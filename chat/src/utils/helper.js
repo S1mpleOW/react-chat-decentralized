@@ -19,12 +19,11 @@ export const toBase64 = (file) =>
 	});
 
 export const setGunMessageRoom = ({
-	room,
 	message: { content, type = 'message', name = '', extension = '' },
 	sender,
 	receiver,
 }) => {
-	gun.get(room).set({
+	gun.get(`conversations`).get(sender).get(receiver).get('messages').set({
 		sender,
 		content,
 		messageType: type,
