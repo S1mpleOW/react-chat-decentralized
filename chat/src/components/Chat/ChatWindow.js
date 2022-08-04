@@ -27,7 +27,6 @@ const ChatWindow = ({ inputSectionOffset = 0 }) => {
 			.get('messages')
 			.map()
 			.once((data, id) => {
-				console.log(data);
 				if (!data || data.length === 0) {
 					return;
 				}
@@ -44,7 +43,6 @@ const ChatWindow = ({ inputSectionOffset = 0 }) => {
 	}, [conversationId]);
 
 	const size = messages && messages.length;
-	console.log(messages);
 	return (
 		<InfiniteScroll
 			next={() => setLimitCount((prev) => prev + 10)}

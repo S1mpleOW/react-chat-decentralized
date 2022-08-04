@@ -29,6 +29,8 @@ function App() {
 				});
 			}
 			navigate(`/`);
+		} else {
+			navigate(`/sign-in`);
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [user]);
@@ -72,6 +74,7 @@ function App() {
 
 export const gun = new Gun({
 	peers: ['http://localhost:8765/gun'],
+	localStorage: false,
 });
 
 export default App;

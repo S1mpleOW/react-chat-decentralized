@@ -69,3 +69,20 @@ export const isFileOrImage = (extension) => {
 	}
 	return 'file';
 };
+
+export const isAddFriend = ({ senderId, receiverId }) => {
+	gun
+		.get('conversations')
+		.get(senderId)
+		.get(receiverId)
+		.map()
+		.once((data) => {
+			console.log(data);
+			if (data && data?.isConfirmed) {
+				return true;
+			} else {
+				return false;
+			}
+		});
+	//return false;
+};

@@ -72,10 +72,12 @@ const CreateConversation = ({ handleClickAway }) => {
 				gun.get('conversations').get(accountHolder?.userPub).get(selected[0]).set({
 					isCreated: Date.now(),
 					isRemoved: false,
+					isConfirmed: true,
 				});
 				gun.get('conversations').get(selected[0]).get(accountHolder?.userPub).set({
 					isCreated: Date.now(),
 					isRemoved: false,
+					isConfirmed: false,
 				});
 			}
 

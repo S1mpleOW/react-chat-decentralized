@@ -14,7 +14,7 @@ const LeftMessage = ({ message: { content = '', type, extension, name } }) => {
 				<div className={`group relative flex items-stretch gap-2 px-8 mb-6`}>
 					{checkType === 'message' ? (
 						<div
-							className={`bg-left-message after:border-left-message relative rounded-lg p-2 text-white after:absolute after:left-full after:bottom-[6px] after:border-8 after:border-t-transparent after:border-r-transparent break-words max-w-[400px]`}
+							className={`bg-left-message after:border-left-message relative rounded-lg p-2 text-white after:absolute after:right-full after:bottom-[6px] after:border-8 after:border-t-transparent after:border-l-transparent break-words max-w-[400px]`}
 						>
 							<span>{content || ''}</span>
 						</div>
@@ -35,7 +35,7 @@ const LeftMessage = ({ message: { content = '', type, extension, name } }) => {
 						</>
 					) : checkType === 'file' ? (
 						<a
-							className="bg-left-message after:border-left-message relative rounded-lg p-2 text-white after:absolute after:left-full after:bottom-[6px] after:border-8 after:border-t-transparent after:border-r-transparent break-words max-w-[400px] "
+							className="bg-left-message after:border-left-message relative rounded-lg p-2 text-white after:absolute after:right-full after:bottom-[6px] after:border-8 after:border-t-transparent after:border-l-transparent break-words max-w-[400px] "
 							href={content}
 						>
 							<div className="flex items-center w-full">

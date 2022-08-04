@@ -8,6 +8,7 @@ import { useUserStore } from '../store';
 import CreateConversation from './Home/CreateConversation';
 import SelectConversation from './Home/SelectConversation';
 import UserInfo from './Home/UserInfo';
+import { isAddFriend } from '../utils/helper';
 
 const SideBar = () => {
 	const [data, setData] = useState([]);
@@ -33,6 +34,11 @@ const SideBar = () => {
 					console.log(conversation);
 					const conversationId = conversation && conversation['_']['#'].split('/')[2];
 					if (conversationId) {
+						// const isExistConversation = isAddFriend({
+						// 	senderId: accountHolder?.userPub,
+						// 	receiverId: conversationId,
+						// });
+						// console.log(isExistConversation);
 						gun
 							.get('users')
 							.get(conversationId)
@@ -55,7 +61,7 @@ const SideBar = () => {
 		setLoading(false);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [accountHolder.userPub]);
-
+	console.log(loading);
 	const location = useLocation();
 	return (
 		<div className="relative">
