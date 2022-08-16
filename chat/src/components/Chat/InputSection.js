@@ -1,11 +1,20 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Spin } from 'react-cssfx-loading';
 import { useParams } from 'react-router-dom';
 import getIcon from '../../utils/constants';
-import { getFileName, toBase64, setGunMessageRoom, getFileType } from '../../utils/helper';
+import {
+	getFileName,
+	toBase64,
+	setGunMessageRoom,
+	getFileType,
+	checkTypeConfirm,
+} from '../../utils/helper';
 import InputSendMessage from './InputSendMessage';
 import IconPicker from './IconPicker';
 import { useUserStore } from '../../store';
+import { useMessageContext } from '../../contexts/messageContext';
+import Button from '../Authen/Button';
+import { gun } from '../../App';
 
 const pushAllFiles = (files, { sender, receiver }) => {
 	let fileList = [];
@@ -35,8 +44,31 @@ const InputSection = ({ setInputSectionOffset, disabled }) => {
 	const textInputRef = useRef(null);
 	const imageInputRef = useRef(null);
 	const fileInputRef = useRef(null);
-
 	const conversationId = useParams();
+	const [isPending, setIsPending] = useState(false);
+	const { user } = useUserStore();
+	const { type, setType } = useMessageContext();
+	const handleApproved = () => {
+		gun.get('conversations').get(user?.userPub).get(conversationId?.id).put({
+			isConfirmed: 'approved',
+		});
+		setType('approved');
+	};
+
+	useEffect(() => {
+		(async () => {
+			const pendingType = await checkTypeConfirm({
+				senderId: user.userPub,
+				receiverId: conversationId.id,
+			});
+			if (pendingType === 'pending') {
+				setIsPending(true);
+			} else {
+				setIsPending(false);
+			}
+		})();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [type]);
 	const checkFileExists = useCallback(
 		(file) => {
 			if (!file) return;
@@ -54,8 +86,6 @@ const InputSection = ({ setInputSectionOffset, disabled }) => {
 		},
 		[previewFiles]
 	);
-
-	const { user } = useUserStore();
 
 	useEffect(() => {
 		textInputRef.current?.focus();
@@ -157,6 +187,20 @@ const InputSection = ({ setInputSectionOffset, disabled }) => {
 			setPreviewFiles((prev) => [...prev, files[i]]);
 		}
 	};
+	if (isPending) {
+		return (
+			<div
+				className={`border-dark-green dark:border-dark-green-lighter flex justify-center border-t h-16`}
+			>
+				<Button
+					onClick={handleApproved}
+					className="relative w-1/2 text-base font-semibold text-white transition-all duration-300 ease-in-out -translate-y-1/2 border-none rounded-lg cursor-pointer h-1/2 top-1/2 disabled:opacity-50 bg-gradient-to-r from-green-primary to bg-green-secondary active:scale-95 hover:opacity-80 disabled:cursor-not-allowed"
+				>
+					Approve
+				</Button>
+			</div>
+		);
+	}
 
 	return (
 		<>

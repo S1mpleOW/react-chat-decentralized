@@ -12,6 +12,7 @@ import Button from '../components/Authen/Button';
 
 import { user } from '../auth';
 import { useUserStore } from '../store';
+import { gun } from '../App';
 
 const schema = yup.object().shape({
 	username: yup.string().required('Username is required'),
@@ -55,6 +56,10 @@ const SignIn = () => {
 			};
 			console.log('🚀 ~ file: SignIn.js ~ line 55 ~ user.auth ~ userInfo', userInfo);
 			reset({ username: '', password: '' });
+			gun.get('users').get(userInfo.userPub).put({
+				isOnline: true,
+			});
+
 			setUser(userInfo);
 			return;
 		});

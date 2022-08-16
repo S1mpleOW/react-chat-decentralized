@@ -17,13 +17,11 @@ function App() {
 
 	useEffect(() => {
 		if (user) {
-			console.log(user);
 			if (user.pub) {
 				gun.user(user.pub).once((user) => {
-					console.log(user);
 					const userInfo = {
-						userName: user.alias,
-						userPub: user.pub, //public key
+						userName: user?.alias,
+						userPub: user?.pub, //public key
 					};
 					setUser(userInfo);
 				});
@@ -43,6 +41,7 @@ function App() {
 			document?.documentElement?.classList.remove('dark');
 		}
 	}, [darkMode]);
+
 	return (
 		<Routes>
 			<Route
@@ -51,23 +50,31 @@ function App() {
 						<div className="absolute top-0 right-0 z-10 inline-block m-3 ">
 							<Toggle on={darkMode} onClick={toggleDarkMode}></Toggle>
 						</div>
-						{!user ? (
-							<>
-								<h1>Please login to chat</h1>
-							</>
-						) : (
-							<Outlet />
-						)}
+						<Outlet />
 					</>
 				}
 			>
-				<Route element={<Main />}>
-					<Route path="/" element={<Home />}></Route>
-					<Route path="/chat/:id" element={<ChatRoom />}></Route>
+				<Route
+					element={
+						<>
+							{!user ? (
+								<>
+									<h1>Please login to chat</h1>
+								</>
+							) : (
+								<Outlet />
+							)}
+						</>
+					}
+				>
+					<Route element={<Main />}>
+						<Route path="/" element={<Home />}></Route>
+						<Route path="/chat/:id" element={<ChatRoom />}></Route>
+					</Route>
 				</Route>
+				<Route path="/sign-in" element={<SignIn />}></Route>
+				<Route path="/sign-up" element={<SignUp />}></Route>
 			</Route>
-			<Route path="/sign-in" element={<SignIn />}></Route>
-			<Route path="/sign-up" element={<SignUp />}></Route>
 		</Routes>
 	);
 }

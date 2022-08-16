@@ -40,7 +40,7 @@ const ChatWindow = ({ inputSectionOffset = 0 }) => {
 				});
 			});
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [conversationId]);
+	}, [conversationId?.id]);
 
 	const size = messages && messages.length;
 	return (

@@ -44,10 +44,10 @@ export const setGunMessageRoom = ({
 };
 
 export const setGunUsers = ({ name = '', isOnline = false, pubKey = '' }) => {
-	gun.get('users').get(pubKey).set({
+	gun.get('users').get(pubKey).put({
 		name,
-		isOnline,
 		pubKey,
+		isOnline,
 	});
 };
 
@@ -70,19 +70,53 @@ export const isFileOrImage = (extension) => {
 	return 'file';
 };
 
-export const isAddFriend = ({ senderId, receiverId }) => {
-	gun
-		.get('conversations')
-		.get(senderId)
-		.get(receiverId)
-		.map()
-		.once((data) => {
-			console.log(data);
-			if (data && data?.isConfirmed) {
-				return true;
-			} else {
-				return false;
-			}
-		});
-	//return false;
+export const checkTypeConfirm = ({ senderId, receiverId }) => {
+	return new Promise((resolve) => {
+		gun
+			.get('conversations')
+			.get(senderId)
+			.get(receiverId)
+			.on((data) => {
+				console.log(data);
+				if (data) {
+					resolve(data?.isConfirmed);
+				} else {
+					resolve(false);
+				}
+			});
+	});
+};
+
+export const isApproved = ({ senderId, receiverId }) => {
+	return new Promise((resolve) => {
+		gun
+			.get('conversations')
+			.get(senderId)
+			.get(receiverId)
+			.map()
+			.once((data) => {
+				if (data && data?.isConfirmed === 'approved') {
+					resolve(true);
+				} else {
+					resolve(false);
+				}
+			});
+	});
+};
+
+export const checkIsOnline = (pubKey) => {
+	console.log(pubKey);
+	return new Promise((resolve) => {
+		gun
+			.get('users')
+			.get(pubKey)
+			.get('isOnline')
+			.map()
+			.once((data) => {
+				if (data) {
+					resolve(data);
+				}
+				resolve(false);
+			});
+	});
 };
