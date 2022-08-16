@@ -23,7 +23,7 @@ const LeftMessage = ({ message: { content = '', type, extension, name } }) => {
 							<img
 								src={content}
 								alt="message"
-								className="lg:max-w-[700px] lg:max-h-[700px] object-cover rounded-lg cursor-pointer hover:brightness-90"
+								className="lg:max-w-[500px] lg:max-h-[300px] object-cover rounded-lg cursor-pointer hover:brightness-90"
 								onClick={() => setIsImageViewOpened(true)}
 							/>
 
@@ -37,6 +37,7 @@ const LeftMessage = ({ message: { content = '', type, extension, name } }) => {
 						<a
 							className="bg-left-message after:border-left-message relative rounded-lg p-2 text-white after:absolute after:right-full after:bottom-[6px] after:border-8 after:border-t-transparent after:border-l-transparent break-words max-w-[400px] "
 							href={content}
+							download={name}
 						>
 							<div className="flex items-center w-full">
 								<DownLoadIcon className="w-[10%]"></DownLoadIcon>

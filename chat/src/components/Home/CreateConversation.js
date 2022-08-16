@@ -2,40 +2,50 @@ import React, { useEffect, useState } from 'react';
 import { Spin } from 'react-cssfx-loading';
 import { useNavigate } from 'react-router-dom';
 import { gun } from '../../App';
+import { useMessageContext } from '../../contexts/messageContext';
 import { useUserStore } from '../../store';
 
 const CreateConversation = ({ handleClickAway }) => {
 	const [isLoading, setIsLoading] = useState(false);
 	const [selected, setSelected] = useState([]);
 	const [data, setData] = useState([]);
+	const { setType } = useMessageContext();
 	const { user: accountHolder } = useUserStore();
+	console.log(selected);
 	useEffect(() => {
 		setIsLoading(true);
+		console.log(accountHolder);
 		if (accountHolder) {
-			console.log(accountHolder.userPub);
 			gun
 				.get('users')
 				.map()
-				.once((user) => {
-					const userId = user && user['_']['#'].split('/')[1];
-					console.log(userId);
-					if (userId !== accountHolder.userPub) {
-						const userData = gun
-							.get(`users`)
-							.get(userId)
-							.map()
-							.once((user) => {
-								if (user) {
-									const userInfo = {
-										uid: userId,
-										displayName: user.name,
-										photoURL: `${process.env.REACT_APP_AVATAR}/${user.name.slice(0, 2)}.svg`,
-									};
-									setData((prev) => [...prev, userInfo]);
-								}
-							});
-						console.log(userData);
+				.once((user, id) => {
+					console.log(user);
+					if (id !== accountHolder?.userPub && user?.name) {
+						const userInfo = {
+							uid: id,
+							displayName: user?.name,
+							photoURL: `${process.env.REACT_APP_AVATAR}/${user?.name.slice(0, 2)}.svg`,
+						};
+						setData((prev) => [...prev, userInfo]);
 					}
+					// const userId = user && user['_'] && user['_']['#']?.split('/')[1];
+					// if (userId !== accountHolder.userPub) {
+					// 	gun
+					// 		.get(`users`)
+					// 		.get(userId)
+					// 		.once((user) => {
+					// 			console.log(user);
+					// 			if (user && user.name) {
+					// 				const userInfo = {
+					// 					uid: userId,
+					// 					displayName: user.name,
+					// 					photoURL: `${process.env.REACT_APP_AVATAR}/${user?.name.slice(0, 2)}.svg`,
+					// 				};
+					// 				setData((prev) => [...prev, userInfo]);
+					// 			}
+					// 		});
+					// }
 				});
 		}
 		setIsLoading(false);
@@ -43,46 +53,56 @@ const CreateConversation = ({ handleClickAway }) => {
 	}, []);
 
 	const handleToggle = (uid) => {
-		if (selected.includes(uid)) {
-			setSelected(selected.filter((id) => id !== uid));
-		} else {
-			setSelected([...selected, uid]);
-		}
+		// if (selected.includes(uid)) {
+		// 	setSelected(selected.filter((id) => id !== uid));
+		// } else {
+		// 	setSelected([...selected, uid]);
+		// }
+		setSelected([uid]);
 	};
 	const navigate = useNavigate();
-	console.log(selected);
 	const handleCreateConversation = () => {
 		setIsLoading(true);
 		let isExisted = false;
 		if (selected && selected.length === 1) {
+			console.log(accountHolder);
 			gun
 				.get('conversations')
 				.get(accountHolder?.userPub)
 				.get(selected[0])
 				.once((conversation) => {
+					console.log(conversation);
 					if (conversation) {
-						isExisted = true;
+						if (conversation.isConfirmed === 'approved') {
+							isExisted = true;
+						} else if (conversation.isConfirmed === 'pending') {
+							isExisted = true;
+							setType('pending');
+						}
 					}
+					console.log(isExisted);
+					if (isExisted) {
+						navigate(`/chat/${selected[0]}`);
+						console.log(isExisted);
+						return;
+					} else {
+						gun.get('conversations').get(accountHolder?.userPub).get(selected[0]).put({
+							isCreated: Date.now(),
+							isRemoved: false,
+							isConfirmed: 'approved',
+						});
+
+						gun.get('conversations').get(selected[0]).get(accountHolder?.userPub).put({
+							isCreated: Date.now(),
+							isRemoved: false,
+							isConfirmed: 'pending',
+						});
+					}
+					setIsLoading(false);
 				});
-			if (isExisted) {
-				navigate(`/chat/${selected[0]}`);
-				return;
-			}
-			if (accountHolder) {
-				gun.get('conversations').get(accountHolder?.userPub).get(selected[0]).set({
-					isCreated: Date.now(),
-					isRemoved: false,
-					isConfirmed: true,
-				});
-				gun.get('conversations').get(selected[0]).get(accountHolder?.userPub).set({
-					isCreated: Date.now(),
-					isRemoved: false,
-					isConfirmed: false,
-				});
-			}
 
 			navigate(`/chat/${selected[0]}`);
-			setIsLoading(false);
+
 			setSelected([]);
 			handleClickAway(false);
 		}

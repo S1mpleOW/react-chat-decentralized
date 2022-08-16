@@ -3,12 +3,15 @@ import { Spin } from 'react-cssfx-loading';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { gun } from '../App';
 import { user } from '../auth';
+import { useMessageContext } from '../contexts/messageContext';
 import ClickAway from '../pattern/renderProps/ClickAway';
 import { useUserStore } from '../store';
+import { checkTypeConfirm } from '../utils/helper';
 import CreateConversation from './Home/CreateConversation';
 import SelectConversation from './Home/SelectConversation';
 import UserInfo from './Home/UserInfo';
-import { isAddFriend } from '../utils/helper';
+import AllMessageIcon from './icon/AllMessageIcon';
+import PendingMessageIcon from './icon/PendingMessageIcon';
 
 const SideBar = () => {
 	const [data, setData] = useState([]);
@@ -18,50 +21,62 @@ const SideBar = () => {
 	const [loading, setLoading] = useState(false);
 	const { user: accountHolder, setUser } = useUserStore();
 	const navigate = useNavigate();
+	const { type, setType } = useMessageContext();
 	const handleSignOut = () => {
-		user.leave();
+		gun.get('users').get(accountHolder.userPub).put({ isOnline: false });
+		user.leave((data) => console.log(data));
 		setUser(null);
 		navigate('/');
 	};
 	useEffect(() => {
 		setLoading(true);
-		if (accountHolder.userPub) {
+		if (accountHolder && accountHolder.userPub) {
+			console.log(accountHolder);
+			setData([]);
 			gun
 				.get('conversations')
 				.get(accountHolder?.userPub)
 				.map()
 				.once((conversation) => {
 					console.log(conversation);
+					console.log(accountHolder.userPub);
 					const conversationId = conversation && conversation['_']['#'].split('/')[2];
 					if (conversationId) {
-						// const isExistConversation = isAddFriend({
-						// 	senderId: accountHolder?.userPub,
-						// 	receiverId: conversationId,
-						// });
-						// console.log(isExistConversation);
-						gun
-							.get('users')
-							.get(conversationId)
-							.map()
-							.once((receiver) => {
-								if (receiver) {
-									setData((prev) => [
-										...prev,
-										{
-											uid: receiver.pubKey,
-											displayName: receiver.name,
-											photoURL: `${process.env.REACT_APP_AVATAR}/${receiver.name}.svg`,
-										},
-									]);
-								}
+						let expectType = false;
+						(async () => {
+							expectType = await checkTypeConfirm({
+								senderId: accountHolder?.userPub,
+								receiverId: conversationId,
 							});
+							console.log(type, expectType);
+							if (!expectType || expectType !== type) {
+								return;
+							}
+							console.log(type, expectType);
+							gun
+								.get('users')
+								.get(conversationId)
+								.once((receiver) => {
+									console.log(receiver);
+									if (receiver && receiver.name) {
+										setData((prev) => [
+											...prev,
+											{
+												uid: receiver?.pubKey,
+												displayName: receiver?.name,
+												photoURL: `${process.env.REACT_APP_AVATAR}/${receiver.name}.svg`,
+												isOnline: receiver?.isOnline,
+											},
+										]);
+									}
+								});
+						})();
 					}
 				});
 		}
 		setLoading(false);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [accountHolder.userPub]);
-	console.log(loading);
+	}, [accountHolder.userPub, type]);
 	const location = useLocation();
 	return (
 		<div className="relative">
@@ -76,9 +91,12 @@ const SideBar = () => {
 						<h1 className="text-xl font-bold tracking-[2px] text-dark-green">2M</h1>
 					</Link>
 
-					<div className="flex items-center gap-2">
+					<div className="flex items-center gap-2 ">
 						<button
-							onClick={() => setCreateConversationOpened(true)}
+							onClick={() => {
+								setType('approved');
+								setCreateConversationOpened(true);
+							}}
 							className="w-8 h-8 text-white rounded-full bg-dark-green"
 						>
 							<i className="text-xl bx bxs-edit"></i>
@@ -131,6 +149,26 @@ const SideBar = () => {
 					</div>
 				</div>
 
+				<div
+					className="flex justify-between w-full px-6 py-5 transition-all duration-200 ease-in-out border-b cursor-pointer border-b-dark-green dark:border-b-dark-green-lighter hover:bg-dark-green dark:hover:bg-dark-lighten"
+					onClick={() => {
+						setType(() => {
+							if (type === 'approved') {
+								return 'pending';
+							}
+							return 'approved';
+						});
+						setData([]);
+					}}
+				>
+					<div>{type === 'pending' ? 'All' : 'Pending'}</div>
+					{type === 'pending' ? (
+						<AllMessageIcon></AllMessageIcon>
+					) : (
+						<PendingMessageIcon></PendingMessageIcon>
+					)}
+				</div>
+
 				{/* {loading ? (
 			<div className="flex justify-center my-6">
 				<Spin />
@@ -168,7 +206,10 @@ const SideBar = () => {
 					<div className="flex flex-col items-center justify-center my-6">
 						<p className="text-center">No conversation found</p>
 						<button
-							onClick={() => setCreateConversationOpened(true)}
+							onClick={() => {
+								setType('approved');
+								setCreateConversationOpened(true);
+							}}
 							className="text-center text-primary"
 						>
 							Create one
@@ -184,6 +225,7 @@ const SideBar = () => {
 										photoURL={item.photoURL}
 										name={item.displayName}
 										conversationId={item.uid}
+										isOnline={item.isOnline}
 									></SelectConversation>
 								);
 							})}

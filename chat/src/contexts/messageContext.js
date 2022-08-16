@@ -1,4 +1,4 @@
-import { createContext, useContext, useReducer } from 'react';
+import { createContext, useContext, useReducer, useState } from 'react';
 
 const messageContext = createContext();
 // db: [conversationId, messages: [{ sender, message, receiver, createdAt }]]
@@ -13,6 +13,7 @@ const reducer = (state, dispatch) => {
 				return { messages: newMessages };
 			}
 		case 'CLEAR_MESSAGES':
+			console.log('CLEAR_MESSAGES');
 			return { messages: [] };
 		case 'REMOVE_MESSAGE':
 			return state.filter((message) => message.id !== dispatch.payload);
@@ -23,7 +24,13 @@ const reducer = (state, dispatch) => {
 
 const MessageProvider = (props) => {
 	const [state, dispatch] = useReducer(reducer, []);
-	return <messageContext.Provider value={{ state, dispatch }} {...props}></messageContext.Provider>;
+	const [type, setType] = useState('approved');
+	return (
+		<messageContext.Provider
+			value={{ state, dispatch, type, setType }}
+			{...props}
+		></messageContext.Provider>
+	);
 };
 
 const useMessageContext = () => {

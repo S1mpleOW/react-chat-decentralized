@@ -4,7 +4,7 @@ import Skeleton from '../skeleton/Skeleton';
 
 const lastMessageLoading = false;
 
-const SelectConversation = ({ conversationId, name, photoURL }) => {
+const SelectConversation = ({ conversationId, name, photoURL, isOnline }) => {
 	const { id } = useParams();
 	const [loading, setLoading] = useState(false);
 	if (loading) {
@@ -25,12 +25,14 @@ const SelectConversation = ({ conversationId, name, photoURL }) => {
 				conversationId === id ? '!bg-dark-green' : ''
 			}`}
 		>
-			<img
-				className="flex-shrink-0 object-cover rounded-full h-14 w-14"
-				// src={IMAGE_PROXY(filtered?.[0]?.data()?.photoURL)}
-				src={photoURL}
-				alt="avatar"
-			/>
+			<div className="relative flex-shrink-0 h-14 w-14">
+				<img className="object-cover w-full h-full rounded-full" src={photoURL} alt="avatar" />
+				<div
+					className={`absolute bottom-0 right-0 w-4 h-4 rounded-full ${
+						isOnline ? 'bg-green-500' : ''
+					}  `}
+				></div>
+			</div>
 			<div className="flex flex-col items-start flex-grow gap-1 py-1">
 				<p className="max-w-[240px] flex-grow overflow-hidden text-ellipsis whitespace-nowrap">
 					{name}
