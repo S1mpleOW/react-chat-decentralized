@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Spin } from 'react-cssfx-loading';
 import { useParams } from 'react-router-dom';
 import getIcon from '../../utils/constants';
