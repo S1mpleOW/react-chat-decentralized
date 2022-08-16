@@ -3,4 +3,4 @@ fireverse
 test.js
 gun-chat
 chat/src/db
-chat/src/radata
+chat/src/radata/**
