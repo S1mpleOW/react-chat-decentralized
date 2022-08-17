@@ -31,14 +31,15 @@ const SideBar = () => {
 	useEffect(() => {
 		setLoading(true);
 		if (accountHolder && accountHolder.userPub) {
-			console.log(accountHolder);
 			setData([]);
+			console.log(accountHolder);
 			gun
 				.get('conversations')
-				.get(accountHolder?.userPub)
+				.get(accountHolder.userPub)
 				.map()
-				.once((conversation) => {
+				.once((conversation, id) => {
 					console.log(conversation);
+					console.log(id);
 					console.log(accountHolder.userPub);
 					const conversationId = conversation && conversation['_']['#'].split('/')[2];
 					if (conversationId) {
@@ -57,7 +58,6 @@ const SideBar = () => {
 								.get('users')
 								.get(conversationId)
 								.once((receiver) => {
-									console.log(receiver);
 									if (receiver && receiver.name) {
 										setData((prev) => [
 											...prev,

@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { gun } from '../../App';
 import { useMessageContext } from '../../contexts/messageContext';
 import { useUserStore } from '../../store';
+import { createConversation } from '../../utils/helper';
 
 const CreateConversation = ({ handleClickAway }) => {
 	const [isLoading, setIsLoading] = useState(false);
@@ -11,16 +12,17 @@ const CreateConversation = ({ handleClickAway }) => {
 	const [data, setData] = useState([]);
 	const { setType } = useMessageContext();
 	const { user: accountHolder } = useUserStore();
-	console.log(selected);
+	// console.log(selected);
 	useEffect(() => {
 		setIsLoading(true);
-		console.log(accountHolder);
+		// console.log(accountHolder);
+
 		if (accountHolder) {
+			setData([]);
 			gun
 				.get('users')
 				.map()
 				.once((user, id) => {
-					console.log(user);
 					if (id !== accountHolder?.userPub && user?.name) {
 						const userInfo = {
 							uid: id,
@@ -49,8 +51,7 @@ const CreateConversation = ({ handleClickAway }) => {
 				});
 		}
 		setIsLoading(false);
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, []);
+	}, [accountHolder]);
 
 	const handleToggle = (uid) => {
 		// if (selected.includes(uid)) {
@@ -64,55 +65,32 @@ const CreateConversation = ({ handleClickAway }) => {
 	const handleCreateConversation = () => {
 		setIsLoading(true);
 		let isExisted = false;
-		if (selected && selected.length === 1) {
-			console.log(accountHolder);
+		if (selected && selected.length === 1 && accountHolder.userPub) {
 			gun
 				.get('conversations')
-				.get(accountHolder?.userPub)
+				.get(accountHolder.userPub)
 				.get(selected[0])
-				.once((conversation) => {
-					console.log(conversation);
+				.on((conversation) => {
 					if (conversation) {
-						if (conversation.isConfirmed === 'approved') {
-							isExisted = true;
-						} else if (conversation.isConfirmed === 'pending') {
-							isExisted = true;
+						isExisted = true;
+						if (conversation.isConfirmed === 'pending') {
 							setType('pending');
 						}
 					}
-					console.log(isExisted);
-					if (isExisted) {
-						navigate(`/chat/${selected[0]}`);
-						console.log(isExisted);
-						return;
-					} else {
-						gun.get('conversations').get(accountHolder?.userPub).get(selected[0]).put({
-							isCreated: Date.now(),
-							isRemoved: false,
-							isConfirmed: 'approved',
-						});
-
-						gun.get('conversations').get(selected[0]).get(accountHolder?.userPub).put({
-							isCreated: Date.now(),
-							isRemoved: false,
-							isConfirmed: 'pending',
-						});
-					}
-					setIsLoading(false);
 				});
-
+			setIsLoading(false);
 			navigate(`/chat/${selected[0]}`);
 
 			setSelected([]);
 			handleClickAway(false);
+			if (isExisted) {
+				// console.log(isExisted);
+				return;
+			} else {
+				// console.log('case2');
+				createConversation({ senderId: accountHolder.userPub, receiverId: selected[0] });
+			}
 		}
-
-		// setTimeout(() => {
-		// 	setIsLoading(false);
-		// 	setSelected([]);
-		// 	handleClickAway(false);
-		// 	navigate(`/chat/${selected[0]}`);
-		// }, 1000);
 	};
 	return (
 		<div
