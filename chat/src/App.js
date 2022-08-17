@@ -47,7 +47,7 @@ function App() {
 			<Route
 				element={
 					<>
-						<div className="absolute top-0 right-0 z-10 inline-block m-3 ">
+						<div className="absolute right-0 z-10 inline-block m-3 top-2 translate-y-[1px] ">
 							<Toggle on={darkMode} onClick={toggleDarkMode}></Toggle>
 						</div>
 						<Outlet />
@@ -59,7 +59,7 @@ function App() {
 						<>
 							{!user ? (
 								<>
-									<h1>Please login to chat</h1>
+									<HomePage></HomePage>
 								</>
 							) : (
 								<Outlet />
@@ -68,7 +68,7 @@ function App() {
 					}
 				>
 					<Route element={<Main />}>
-						<Route path="/" element={<Home />}></Route>
+						<Route path="/" element={<HomeChat />}></Route>
 						<Route path="/chat/:id" element={<ChatRoom />}></Route>
 					</Route>
 				</Route>

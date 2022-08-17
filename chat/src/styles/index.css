@@ -25,6 +25,13 @@ input[type='checkbox'] {
 	padding: 0 20px;
 }
 
+.container-fluid {
+	max-width: 1536px;
+	width: 100%;
+	margin: 0 auto;
+	padding: 0 20px;
+}
+
 .check-overlay {
 	@apply relative;
 }
@@ -69,6 +76,86 @@ input[type='checkbox'] {
 	background-image: linear-gradient(110deg, #ececec 8%, #f5f5f5 18%, #ececec 33%);
 	background-size: 200% 100%;
 	animation: 1.5s shine linear infinite;
+}
+
+.indicator::after {
+	content: '';
+	width: 14px;
+	height: 14px;
+	border-radius: 50%;
+	position: absolute;
+	bottom: -3px;
+	right: 5px;
+	@apply bg-light;
+}
+
+.button-homepage {
+	--color: #62a388;
+	font-family: 'Poppins', sans-serif;
+	color: white;
+	padding: 10px 50px;
+	border-radius: 10px;
+	background-color: var(--color);
+	background: linear-gradient(to right, #00a7b4, #a4d96c);
+	cursor: pointer;
+	font-weight: 500;
+	outline: none;
+	border: none;
+	font-size: 16px;
+	position: relative;
+	isolation: isolate;
+	overflow: hidden;
+	backface-visibility: hidden;
+}
+
+.button-homepage span {
+	display: inline-flex;
+	width: 100%;
+	height: 100%;
+	transition: all 0.2s linear;
+	backface-visibility: hidden;
+}
+
+.button-homepage:before {
+	content: 'Now!';
+	height: 100%;
+	width: 100%;
+	position: absolute;
+	left: 0;
+	top: -100%;
+	transition: all 0.25s ease-in;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.button-homepage:hover:before {
+	top: 0;
+}
+
+.button-homepage:hover span {
+	transform: translateY(300%);
+}
+
+.button-sign-up {
+	--color: #62a388;
+	font-family: 'Poppins', sans-serif;
+	color: white;
+	border-radius: 4px;
+	background-color: var(--color);
+	cursor: pointer;
+	font-weight: 500;
+	outline: none;
+	border: none;
+	font-size: 16px;
+	-webkit-transform-style: preserve-3d;
+	-moz-transform-style: preserve-3d;
+	transform-style: preserve-3d;
+	transition: all 0.2s linear;
+}
+
+.button-sign-up:hover {
+	transform: rotateY(-15deg);
 }
 
 @keyframes shine {
