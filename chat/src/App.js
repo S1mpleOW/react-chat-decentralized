@@ -8,6 +8,7 @@ import SignUp from './pages/SignUp';
 import Gun from 'gun';
 import { useEffect } from 'react';
 import { useDarkModeSetting, useUserStore } from './store';
+import VideoCall from "./components/VideoCall/VideoCall";
 
 function App() {
 	const darkMode = useDarkModeSetting((state) => state.darkMode);
@@ -27,8 +28,6 @@ function App() {
 				});
 			}
 			navigate(`/`);
-		} else {
-			navigate(`/sign-in`);
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [user]);
@@ -75,6 +74,7 @@ function App() {
 				<Route path="/sign-in" element={<SignIn />}></Route>
 				<Route path="/sign-up" element={<SignUp />}></Route>
 			</Route>
+			<Route path="/video_chat/:roomId" element={<VideoCall />}></Route>
 		</Routes>
 	);
 }
