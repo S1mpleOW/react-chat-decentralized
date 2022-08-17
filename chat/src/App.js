@@ -9,6 +9,7 @@ import { useEffect } from 'react';
 import { useDarkModeSetting, useUserStore } from './store';
 import HomeChat from './pages/HomeChat';
 import HomePage from './pages/HomePage';
+import VideoCall from "./components/VideoCall/VideoCall";
 
 function App() {
 	const darkMode = useDarkModeSetting((state) => state.darkMode);
