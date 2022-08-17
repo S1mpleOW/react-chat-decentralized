@@ -1,13 +1,15 @@
 import { Routes, Route, Outlet, useNavigate } from 'react-router-dom';
 import Toggle from './components/toggle/Toggle';
 import ChatRoom from './pages/ChatRoom';
-import Home from './pages/Home';
 import Main from './pages/Main';
 import SignIn from './pages/SignIn';
 import SignUp from './pages/SignUp';
 import Gun from 'gun';
 import { useEffect } from 'react';
 import { useDarkModeSetting, useUserStore } from './store';
+import HomeChat from './pages/HomeChat';
+import HomePage from './pages/HomePage';
+import VideoCall from "./components/VideoCall/VideoCall";
 
 function App() {
 	const darkMode = useDarkModeSetting((state) => state.darkMode);
@@ -27,8 +29,6 @@ function App() {
 				});
 			}
 			navigate(`/`);
-		} else {
-			navigate(`/sign-in`);
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [user]);
@@ -47,7 +47,7 @@ function App() {
 			<Route
 				element={
 					<>
-						<div className="absolute top-0 right-0 z-10 inline-block m-3 ">
+						<div className="absolute right-0 z-10 inline-block m-3 top-2 translate-y-[1px] ">
 							<Toggle on={darkMode} onClick={toggleDarkMode}></Toggle>
 						</div>
 						<Outlet />
@@ -59,7 +59,7 @@ function App() {
 						<>
 							{!user ? (
 								<>
-									<h1>Please login to chat</h1>
+									<HomePage></HomePage>
 								</>
 							) : (
 								<Outlet />
@@ -68,13 +68,14 @@ function App() {
 					}
 				>
 					<Route element={<Main />}>
-						<Route path="/" element={<Home />}></Route>
+						<Route path="/" element={<HomeChat />}></Route>
 						<Route path="/chat/:id" element={<ChatRoom />}></Route>
 					</Route>
 				</Route>
 				<Route path="/sign-in" element={<SignIn />}></Route>
 				<Route path="/sign-up" element={<SignUp />}></Route>
 			</Route>
+			<Route path="/video_chat/:roomId" element={<VideoCall />}></Route>
 		</Routes>
 	);
 }

@@ -5,13 +5,13 @@ const Toggle = ({ on, onClick, ...rest }) => {
 		<>
 			<input type="checkbox" checked={on} className="hidden-input" onChange={() => {}} />
 			<div
-				className={`inline-block w-[70px] h-[42px] relative cursor-pointer rounded-full p-1 transition-all bg-dark-green dark:bg-dark-green`}
+				className={`inline-block w-[50px] h-[20px] relative cursor-pointer rounded-full transition-all bg-dark-green dark:bg-dark-green`}
 				onClick={onClick}
 				{...rest}
 			>
 				<span
-					className={`transition-all w-[34px] h-[34px]  rounded-full inline-block bg-light dark:bg-dark-lighten ${
-						on ? 'translate-x-[28px]' : ''
+					className={`transition-all duration-300 ease-in-out w-[16px] h-[16px] absolute top-[2px] left-[2px] rounded-full inline-block bg-light dark:bg-dark-lighten indicator overflow-hidden ${
+						on ? 'after:bg-dark-green left-[calc(50px-18px)] rotate-180' : ''
 					}`}
 				></span>
 			</div>

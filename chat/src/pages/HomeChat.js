@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Home = () => {
+const HomeChat = () => {
 	return (
 		<div className="hidden flex-grow flex-col items-center justify-center gap-3 md:!flex">
 			<h1 className="text-center">Select a conversation to start chatting</h1>
@@ -8,4 +8,4 @@ const Home = () => {
 	);
 };
 
-export default Home;
+export default HomeChat;

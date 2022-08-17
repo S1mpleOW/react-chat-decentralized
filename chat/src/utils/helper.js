@@ -77,7 +77,6 @@ export const checkTypeConfirm = ({ senderId, receiverId }) => {
 			.get(senderId)
 			.get(receiverId)
 			.on((data) => {
-				console.log(data);
 				if (data) {
 					resolve(data?.isConfirmed);
 				} else {
@@ -119,4 +118,23 @@ export const checkIsOnline = (pubKey) => {
 				resolve(false);
 			});
 	});
+};
+
+export const createConversation = ({ senderId, receiverId }) => {
+	console.log(senderId, receiverId);
+	if (!senderId || !receiverId) {
+		return false;
+	}
+	gun.get('conversations').get(senderId).get(receiverId).put({
+		isCreated: Date.now(),
+		isRemoved: false,
+		isConfirmed: 'approved',
+	});
+	console.log('create conversation');
+	gun.get('conversations').get(receiverId).get(senderId).put({
+		isCreated: Date.now(),
+		isRemoved: false,
+		isConfirmed: 'pending',
+	});
+	return true;
 };
