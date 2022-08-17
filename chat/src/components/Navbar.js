@@ -3,13 +3,13 @@ import { Link } from 'react-router-dom';
 
 const Navbar = () => {
 	return (
-		<div className="container-fluid min-h-[64px] flex items-center border-b border-dark-green ">
+		<div className="mx-auto px-5 min-h-[64px] flex items-center border-b border-dark-green ">
 			<Link to="/">
 				<img className="w-12 h-12" srcSet="/logo.png 3x" alt="logo" />
 			</Link>
 			<div className="ml-auto mr-16">
 				<div className="flex items-center gap-5">
-					<Link to="/sign-in" className="">
+					<Link to="/sign-in" className="button-sign-in">
 						Sign in
 					</Link>
 					<Link

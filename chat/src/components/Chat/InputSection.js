@@ -15,6 +15,7 @@ import { useUserStore } from '../../store';
 import { useMessageContext } from '../../contexts/messageContext';
 import Button from '../Authen/Button';
 import { gun } from '../../App';
+import { toast } from 'react-toastify';
 
 const pushAllFiles = (files, { sender, receiver }) => {
 	let fileList = [];
@@ -162,8 +163,10 @@ const InputSection = ({ setInputSectionOffset, disabled }) => {
 			const isPushedFile = pushAllFiles(files, informationConversation);
 			if (isPushedFile) {
 				// notify success
+				toast.success('File uploaded successfully');
 			} else {
 				// notify error
+				toast.error('File uploaded failed');
 			}
 			setPreviewFiles([]);
 		}

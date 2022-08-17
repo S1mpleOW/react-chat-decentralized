@@ -13,7 +13,6 @@ const reducer = (state, dispatch) => {
 				return { messages: newMessages };
 			}
 		case 'CLEAR_MESSAGES':
-			console.log('CLEAR_MESSAGES');
 			return { messages: [] };
 		case 'REMOVE_MESSAGE':
 			return state.filter((message) => message.id !== dispatch.payload);

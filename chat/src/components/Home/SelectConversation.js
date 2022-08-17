@@ -1,12 +1,74 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
+import { gun } from '../../App';
+import { useUserStore } from '../../store';
+import { isFileOrImage } from '../../utils/helper';
 import Skeleton from '../skeleton/Skeleton';
-
-const lastMessageLoading = false;
-
 const SelectConversation = ({ conversationId, name, photoURL, isOnline }) => {
 	const { id } = useParams();
 	const [loading, setLoading] = useState(false);
+	const [lastMessage, setLastMessage] = useState('No message');
+	const { user: accountHolder } = useUserStore();
+	const [lastMessageLoading, setLastMessageLoading] = useState(false);
+	const [timeMessagesCreated, setTimeMessagesCreated] = useState(0);
+
+	useEffect(() => {
+		if (!accountHolder || !conversationId) {
+			setLoading(true);
+			setLastMessageLoading(true);
+		}
+		console.log(accountHolder, conversationId);
+		gun
+			.get('conversations')
+			.get(accountHolder.userPub)
+			.get(conversationId)
+			.once((data) => {
+				if (!data) {
+					return;
+				}
+				const { isCreated } = data;
+				if (isCreated) {
+					setTimeMessagesCreated(isCreated);
+				}
+			});
+
+		let checkType = null;
+		gun
+			.get('conversations')
+			.get(accountHolder.userPub)
+			.get(conversationId)
+			.get('messages')
+			.map()
+			.once((data) => {
+				if (!data || data.length === 0) {
+					return;
+				}
+				const { sender, content, createdAt, extension } = data;
+				if (createdAt > timeMessagesCreated) {
+					setLastMessage(content);
+					checkType = isFileOrImage(extension);
+					if (checkType === 'message') {
+						setLastMessage(content);
+					} else if (checkType === 'image') {
+						if (accountHolder.userPub === sender) {
+							setLastMessage('You sent an image');
+						} else {
+							setLastMessage('You received an image');
+						}
+					} else if (checkType === 'file') {
+						if (accountHolder.userPub === sender) {
+							setLastMessage('You sent a file');
+						} else {
+							setLastMessage('You received a file');
+						}
+					}
+					setTimeMessagesCreated(createdAt);
+					setLastMessageLoading(false);
+				}
+			});
+
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, []);
 	if (loading) {
 		return (
 			<div className="flex items-stretch gap-2 px-5 py-2 mb-2 bg-slate-700">
@@ -47,7 +109,7 @@ const SelectConversation = ({ conversationId, name, photoURL, isOnline }) => {
 								: 'text-gray-500 dark:text-gray-400'
 						}`}
 					>
-						Last message
+						{lastMessage}
 					</p>
 				)}
 			</div>
