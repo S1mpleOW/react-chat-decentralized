@@ -1,13 +1,14 @@
 import { Routes, Route, Outlet, useNavigate } from 'react-router-dom';
 import Toggle from './components/toggle/Toggle';
 import ChatRoom from './pages/ChatRoom';
-import Home from './pages/Home';
 import Main from './pages/Main';
 import SignIn from './pages/SignIn';
 import SignUp from './pages/SignUp';
 import Gun from 'gun';
 import { useEffect } from 'react';
 import { useDarkModeSetting, useUserStore } from './store';
+import HomeChat from './pages/HomeChat';
+import HomePage from './pages/HomePage';
 import VideoCall from "./components/VideoCall/VideoCall";
 
 function App() {
