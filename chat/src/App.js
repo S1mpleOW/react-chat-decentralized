@@ -9,8 +9,9 @@ import { useEffect } from 'react';
 import { useDarkModeSetting, useUserStore } from './store';
 import HomeChat from './pages/HomeChat';
 import HomePage from './pages/HomePage';
-import { toast, ToastContainer } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import VideoCall from './components/VideoCall/VideoCall';
 
 function App() {
 	const darkMode = useDarkModeSetting((state) => state.darkMode);
@@ -88,6 +89,7 @@ function App() {
 				<Route path="/sign-in" element={<SignIn />}></Route>
 				<Route path="/sign-up" element={<SignUp />}></Route>
 			</Route>
+			<Route path="/video_chat/:roomId" element={<VideoCall />}></Route>
 		</Routes>
 	);
 }
