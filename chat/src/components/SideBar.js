@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { Spin } from 'react-cssfx-loading';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import { gun } from '../App';
 import { user } from '../auth';
 import { useMessageContext } from '../contexts/messageContext';
 import ClickAway from '../pattern/renderProps/ClickAway';
-import { useUserStore } from '../store';
+import { useDarkModeSetting, useUserStore } from '../store';
 import { checkTypeConfirm } from '../utils/helper';
 import CreateConversation from './Home/CreateConversation';
 import SelectConversation from './Home/SelectConversation';
@@ -26,6 +27,7 @@ const SideBar = () => {
 		gun.get('users').get(accountHolder.userPub).put({ isOnline: false });
 		user.leave((data) => console.log(data));
 		setUser(null);
+		toast.success('Sign out successfully');
 		navigate('/');
 	};
 	useEffect(() => {
