@@ -1,6 +1,9 @@
 import React from 'react';
+import { toast } from 'react-toastify';
+import { useUserStore } from '../../store';
 
 const UserInfo = ({ isUserInfoOpened = false, setIsUserInfoOpened = () => {} }) => {
+	const { user } = useUserStore();
 	return (
 		<div
 			onClick={() => setIsUserInfoOpened(false)}
@@ -31,24 +34,26 @@ const UserInfo = ({ isUserInfoOpened = false, setIsUserInfoOpened = () => {} }) 
 						<img
 							className="object-cover w-16 h-16 rounded-full"
 							// src={IMAGE_PROXY(currentUser?.photoURL as string)}
-							src="https://source.unsplash.com/random"
-							alt=""
+							src={`${process.env.REACT_APP_AVATAR}/${user.userName}.svg`}
+							alt="avatar"
 						/>
 						<div className="flex flex-col gap-2">
-							{/* <h1 className="text-xl">{currentUser?.displayName}</h1> */}
-							{/* <p>ID: {currentUser?.uid}</p> */}
-							{/* <p>Email: {currentUser?.email || "None"}</p> */}
-							{/* <p>Phone Number: {currentUser?.phoneNumber || "None"}</p> */}
-							<h1 className="text-xl">S1mpleOW</h1>
-							<p>Email: S1mple@gmail.com</p>
-							<p>Phone Number: 012312312312</p>
+							<h1 className="text-xl">{user?.userName}</h1>
+							<p>Email: {user?.userName}@gmail.com</p>
 						</div>
 					</div>
 
 					<div className="flex items-center gap-2 mt-4">
 						<button className="flex items-center justify-center w-1/2 h-full p-3 font-semibold transition-all duration-500 ease-in-out border border-transparent rounded-lg bg-dark-green hover:bg-transparent hover:border-dark-green ">
 							<i className="bx bx-edit"></i>
-							<span className="ml-2">Edit Profile</span>
+							<span
+								onClick={() => {
+									toast.warn('Not implemented yet!');
+								}}
+								className="ml-2"
+							>
+								Edit Profile
+							</span>
 						</button>
 						<button className="flex items-center justify-center w-1/2 h-full p-3 font-semibold transition-all duration-300 ease-in-out border border-transparent rounded-lg bg-dark-lighten dark:bg-dark-lighten hover:border hover:border-dark-green">
 							<i className="bx bx-log-out"></i>

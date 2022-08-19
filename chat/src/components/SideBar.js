@@ -6,7 +6,7 @@ import { gun } from '../App';
 import { user } from '../auth';
 import { useMessageContext } from '../contexts/messageContext';
 import ClickAway from '../pattern/renderProps/ClickAway';
-import { useDarkModeSetting, useUserStore } from '../store';
+import { useUserStore } from '../store';
 import { checkTypeConfirm } from '../utils/helper';
 import CreateConversation from './Home/CreateConversation';
 import SelectConversation from './Home/SelectConversation';
@@ -40,9 +40,6 @@ const SideBar = () => {
 				.get(accountHolder.userPub)
 				.map()
 				.once((conversation, id) => {
-					console.log(conversation);
-					console.log(id);
-					console.log(accountHolder.userPub);
 					const conversationId = conversation && conversation['_']['#'].split('/')[2];
 					if (conversationId) {
 						let expectType = false;
@@ -151,7 +148,7 @@ const SideBar = () => {
 					</div>
 				</div>
 
-				<div
+				{/* <div
 					className="flex justify-between w-full px-6 py-5 transition-all duration-200 ease-in-out border-b cursor-pointer border-b-dark-green dark:border-b-dark-green-lighter hover:bg-dark-green dark:hover:bg-dark-lighten"
 					onClick={() => {
 						setType(() => {
@@ -169,8 +166,35 @@ const SideBar = () => {
 					) : (
 						<PendingMessageIcon></PendingMessageIcon>
 					)}
+				</div> */}
+				<div className="flex">
+					<div
+						className="flex justify-between w-1/2 px-6 py-5 text-center transition-all duration-200 ease-in-out border-b border-r cursor-pointer border-b-dark-green dark:border-b-dark-green-lighter hover:bg-dark-green dark:hover:bg-dark-lighten"
+						onClick={() => {
+							setType('approved');
+							setData([]);
+						}}
+						style={{
+							backgroundColor: type === 'approved' ? '#62a388' : 'transparent',
+							color: type === 'approved' ? 'black' : '#62a388',
+						}}
+					>
+						<div>All messages</div>
+					</div>
+					<div
+						className="flex justify-between w-1/2 px-6 py-5 text-center transition-all duration-200 ease-in-out border-b cursor-pointer border-b-dark-green dark:border-b-dark-green-lighter hover:bg-dark-green dark:hover:bg-dark-lighten"
+						onClick={() => {
+							setType('pending');
+							setData([]);
+						}}
+						style={{
+							backgroundColor: type === 'pending' ? '#62a388' : 'transparent',
+							color: type === 'pending' ? 'black' : '#62a388',
+						}}
+					>
+						<div>Pending</div>
+					</div>
 				</div>
-
 				{/* {loading ? (
 			<div className="flex justify-center my-6">
 				<Spin />

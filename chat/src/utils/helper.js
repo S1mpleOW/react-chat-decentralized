@@ -129,12 +129,20 @@ export const createConversation = ({ senderId, receiverId }) => {
 		isCreated: Date.now(),
 		isRemoved: false,
 		isConfirmed: 'approved',
+		theme: '#62A388',
 	});
 	console.log('create conversation');
 	gun.get('conversations').get(receiverId).get(senderId).put({
 		isCreated: Date.now(),
 		isRemoved: false,
 		isConfirmed: 'pending',
+		theme: '#62A388',
 	});
 	return true;
+};
+
+export const formatFileSize = (size) => {
+	let i = Math.floor(Math.log(size) / Math.log(1024));
+
+	return `${(size / Math.pow(1024, i)).toFixed(1)} ${['B', 'KB', 'MB', 'GB', 'TB'][i]}`;
 };

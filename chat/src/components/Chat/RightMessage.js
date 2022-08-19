@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import { useTheme } from '../../contexts/themeContext';
 import { isFileOrImage } from '../../utils/helper';
 import DownLoadIcon from '../icon/DownLoadIcon';
 import ImageView from './ImageView';
@@ -6,7 +7,8 @@ import ImageView from './ImageView';
 const RightMessage = ({ message: { content = '', type, extension, name } }) => {
 	const [isImageViewOpened, setIsImageViewOpened] = useState(false);
 	const checkType = useMemo(() => isFileOrImage(extension), [extension]);
-
+	const { theme, getTheme } = useTheme();
+	const classes = getTheme(theme);
 	return (
 		<>
 			{(!type && !extension) || !content ? (
@@ -15,8 +17,18 @@ const RightMessage = ({ message: { content = '', type, extension, name } }) => {
 				<div className={`group relative flex flex-row-reverse items-stretch gap-2 px-8 mb-6`}>
 					{checkType === 'message' ? (
 						<div
-							className={`bg-primary after:border-primary relative rounded-lg p-2 text-white after:absolute after:left-full after:bottom-[6px] after:border-8 after:border-t-transparent after:border-r-transparent break-words max-w-[400px]`}
+							style={{
+								backgroundColor: `var(--${classes})`,
+							}}
+							className={`relative rounded-lg p-2 text-white break-words max-w-[400px]`}
 						>
+							<div
+								style={{
+									borderBottomColor: `var(--${classes})`,
+									borderLeftColor: `var(--${classes})`,
+								}}
+								className="absolute left-full bottom-[6px] border-8 border-t-transparent border-r-transparent"
+							></div>
 							<span>{content || ''}</span>
 						</div>
 					) : checkType === 'image' ? (
@@ -36,11 +48,21 @@ const RightMessage = ({ message: { content = '', type, extension, name } }) => {
 						</>
 					) : checkType === 'file' ? (
 						<a
-							className="bg-primary after:border-primary relative rounded-lg p-2 text-white after:absolute after:left-full after:bottom-[6px] after:border-8 after:border-t-transparent after:border-r-transparent break-words max-w-[400px] "
+							className="relative rounded-lg p-2 text-white  break-words max-w-[400px] "
 							href={content}
 							download={name}
+							style={{
+								backgroundColor: `var(--${classes})`,
+							}}
 						>
-							<div className="flex items-center w-full">
+							<div
+								style={{
+									borderBottomColor: `var(--${classes})`,
+									borderLeftColor: `var(--${classes})`,
+								}}
+								className="absolute left-full bottom-[6px] border-8 border-t-transparent border-r-transparent"
+							></div>
+							<div className="flex items-center w-full gap-2">
 								<DownLoadIcon className="w-[10%]"></DownLoadIcon>
 								<span className="w-[90%] break-word">{name}</span>
 							</div>
