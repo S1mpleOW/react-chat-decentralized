@@ -12,6 +12,8 @@ import Button from '../components/Authen/Button';
 
 import { user } from '../auth';
 import { setGunUsers } from '../utils/helper';
+import { toast } from 'react-toastify';
+import { useDarkModeSetting } from '../store';
 
 const schema = yup.object().shape({
 	username: yup.string().required('Username is required'),
@@ -56,7 +58,7 @@ const SignUp = () => {
 				isOnline: false,
 			};
 			setGunUsers(user);
-
+			toast.success('Sign up successfully');
 			reset({ username: '', password: '', passwordConfirm: '' });
 			return;
 		});

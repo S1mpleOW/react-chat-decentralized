@@ -11,6 +11,7 @@ import RightMessage from './RightMessage';
 const ChatWindow = ({ inputSectionOffset = 0 }) => {
 	const [limitCount, setLimitCount] = useState(10);
 	const conversationId = useParams();
+
 	const { user } = useUserStore();
 	const {
 		state: { messages },

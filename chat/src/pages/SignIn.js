@@ -11,8 +11,9 @@ import { NavLink } from 'react-router-dom';
 import Button from '../components/Authen/Button';
 
 import { user } from '../auth';
-import { useUserStore } from '../store';
+import { useDarkModeSetting, useUserStore } from '../store';
 import { gun } from '../App';
+import { toast } from 'react-toastify';
 
 const schema = yup.object().shape({
 	username: yup.string().required('Username is required'),
@@ -39,7 +40,6 @@ const SignIn = () => {
 	});
 
 	const { setUser } = useUserStore();
-
 	const onSubmit = (data) => {
 		user.auth(data.username, data.password, (ack) => {
 			console.log(ack);
@@ -60,6 +60,7 @@ const SignIn = () => {
 				isOnline: true,
 			});
 
+			toast.success('Sign in successfully');
 			setUser(userInfo);
 			return;
 		});

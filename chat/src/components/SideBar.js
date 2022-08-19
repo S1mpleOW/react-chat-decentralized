@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Spin } from 'react-cssfx-loading';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import { gun } from '../App';
 import { user } from '../auth';
 import { useMessageContext } from '../contexts/messageContext';
@@ -26,6 +27,7 @@ const SideBar = () => {
 		gun.get('users').get(accountHolder.userPub).put({ isOnline: false });
 		user.leave((data) => console.log(data));
 		setUser(null);
+		toast.success('Sign out successfully');
 		navigate('/');
 	};
 	useEffect(() => {
@@ -38,9 +40,6 @@ const SideBar = () => {
 				.get(accountHolder.userPub)
 				.map()
 				.once((conversation, id) => {
-					console.log(conversation);
-					console.log(id);
-					console.log(accountHolder.userPub);
 					const conversationId = conversation && conversation['_']['#'].split('/')[2];
 					if (conversationId) {
 						let expectType = false;
@@ -149,7 +148,7 @@ const SideBar = () => {
 					</div>
 				</div>
 
-				<div
+				{/* <div
 					className="flex justify-between w-full px-6 py-5 transition-all duration-200 ease-in-out border-b cursor-pointer border-b-dark-green dark:border-b-dark-green-lighter hover:bg-dark-green dark:hover:bg-dark-lighten"
 					onClick={() => {
 						setType(() => {
@@ -167,8 +166,35 @@ const SideBar = () => {
 					) : (
 						<PendingMessageIcon></PendingMessageIcon>
 					)}
+				</div> */}
+				<div className="flex">
+					<div
+						className="flex justify-between w-1/2 px-6 py-5 text-center transition-all duration-200 ease-in-out border-b border-r cursor-pointer border-b-dark-green dark:border-b-dark-green-lighter hover:bg-dark-green dark:hover:bg-dark-lighten"
+						onClick={() => {
+							setType('approved');
+							setData([]);
+						}}
+						style={{
+							backgroundColor: type === 'approved' ? '#62a388' : 'transparent',
+							color: type === 'approved' ? 'black' : '#62a388',
+						}}
+					>
+						<div>All messages</div>
+					</div>
+					<div
+						className="flex justify-between w-1/2 px-6 py-5 text-center transition-all duration-200 ease-in-out border-b cursor-pointer border-b-dark-green dark:border-b-dark-green-lighter hover:bg-dark-green dark:hover:bg-dark-lighten"
+						onClick={() => {
+							setType('pending');
+							setData([]);
+						}}
+						style={{
+							backgroundColor: type === 'pending' ? '#62a388' : 'transparent',
+							color: type === 'pending' ? 'black' : '#62a388',
+						}}
+					>
+						<div>Pending</div>
+					</div>
 				</div>
-
 				{/* {loading ? (
 			<div className="flex justify-center my-6">
 				<Spin />

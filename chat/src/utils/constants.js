@@ -24,7 +24,7 @@ const getIcon = (file) => {
 };
 
 export const THEMES = [
-	'#0D90F3',
+	'#62A388',
 	'#EB3A2A',
 	'#0AD4EB',
 	'#643ECB',
@@ -33,6 +33,7 @@ export const THEMES = [
 	'#B43F3F',
 	'#E6A50A',
 	'#69C90C',
+	'#0D90F3',
 ];
 
 export const STICKERS_URL =

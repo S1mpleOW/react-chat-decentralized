@@ -39,7 +39,7 @@ const LeftMessage = ({ message: { content = '', type, extension, name } }) => {
 							href={content}
 							download={name}
 						>
-							<div className="flex items-center w-full">
+							<div className="flex items-center w-full gap-2">
 								<DownLoadIcon className="w-[10%]"></DownLoadIcon>
 								<span className="w-[90%] break-word">{name}</span>
 							</div>

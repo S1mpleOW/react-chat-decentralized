@@ -15,6 +15,8 @@ import { useUserStore } from '../../store';
 import { useMessageContext } from '../../contexts/messageContext';
 import Button from '../Authen/Button';
 import { gun } from '../../App';
+import { toast } from 'react-toastify';
+import { useTheme } from '../../contexts/themeContext';
 
 const pushAllFiles = (files, { sender, receiver }) => {
 	let fileList = [];
@@ -48,6 +50,9 @@ const InputSection = ({ setInputSectionOffset, disabled }) => {
 	const [isPending, setIsPending] = useState(false);
 	const { user } = useUserStore();
 	const { type, setType } = useMessageContext();
+	const { theme, getTheme } = useTheme();
+	const classes = getTheme(theme);
+
 	const handleApproved = () => {
 		gun.get('conversations').get(user?.userPub).get(conversationId?.id).put({
 			isConfirmed: 'approved',
@@ -162,8 +167,10 @@ const InputSection = ({ setInputSectionOffset, disabled }) => {
 			const isPushedFile = pushAllFiles(files, informationConversation);
 			if (isPushedFile) {
 				// notify success
+				toast.success('File uploaded successfully');
 			} else {
 				// notify error
+				toast.error('File uploaded failed');
 			}
 			setPreviewFiles([]);
 		}
@@ -238,7 +245,8 @@ const InputSection = ({ setInputSectionOffset, disabled }) => {
 			>
 				<button
 					onClick={() => imageInputRef.current?.click()}
-					className="flex items-center flex-shrink-0 text-2xl text-primary"
+					style={{ color: `var(--${classes})` }}
+					className="flex items-center flex-shrink-0 text-2xl"
 				>
 					<i className="bx bxs-image-add"></i>
 				</button>
@@ -253,7 +261,8 @@ const InputSection = ({ setInputSectionOffset, disabled }) => {
 				/>
 				<button
 					onClick={() => fileInputRef.current?.click()}
-					className="flex items-center flex-shrink-0 text-2xl text-primary"
+					style={{ color: `var(--${classes})` }}
+					className="flex items-center flex-shrink-0 text-2xl"
 				>
 					<i className="bx bx-link-alt"></i>
 				</button>
@@ -296,9 +305,10 @@ const InputSection = ({ setInputSectionOffset, disabled }) => {
 								e.stopPropagation();
 								setIsIconPickerOpened(true);
 							}}
+							style={{ color: `var(--${classes})` }}
 							className="absolute -translate-y-1/2 right-2 top-1/2"
 						>
-							<i className="text-2xl bx bxs-smile text-primary"></i>
+							<i className="text-2xl bx bxs-smile"></i>
 						</button>
 
 						{isIconPickerOpened && (
@@ -314,7 +324,11 @@ const InputSection = ({ setInputSectionOffset, disabled }) => {
 							<Spin width="24px" height="24px" color="#0D90F3" />
 						</div>
 					) : (
-						<button type="submit" className="flex items-center flex-shrink-0 text-2xl text-primary">
+						<button
+							type="submit"
+							className="flex items-center flex-shrink-0 text-2xl text-primary"
+							style={{ color: `var(--${classes})` }}
+						>
 							<i className="bx bxs-send"></i>
 						</button>
 					)}

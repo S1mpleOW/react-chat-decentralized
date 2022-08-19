@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import ChatHeader from '../components/Chat/ChatHeader';
 import ChatWindow from '../components/Chat/ChatWindow';
 import InputSection from '../components/Chat/InputSection';
+import { ThemeProvider } from '../contexts/themeContext';
 import { useUserStore } from '../store';
 
 const ChatRoom = () => {
@@ -19,11 +20,11 @@ const ChatRoom = () => {
 					<InputSection disabled />
 				</>
 			) : (
-				<>
+				<ThemeProvider>
 					<ChatHeader></ChatHeader>
 					<ChatWindow inputSectionOffset={inputSectionOffset}></ChatWindow>
 					<InputSection setInputSectionOffset={setInputSectionOffset} disabled={false} />
-				</>
+				</ThemeProvider>
 			)}
 		</div>
 	);

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { gun } from '../../App';
+import { useUserStore } from '../../store';
 import ImageView from './ImageView';
 
 const Image = ({ src = '' }) => {
@@ -20,11 +21,17 @@ const Image = ({ src = '' }) => {
 
 const Images = () => {
 	const conversationId = useParams();
-	const [images, setImages] = React.useState([]);
+	const [images, setImages] = useState([]);
+	const { user } = useUserStore();
+	console.log(images);
 	useEffect(() => {
 		if (!conversationId) return;
+		setImages([]);
 		gun
-			.get('messages-room1')
+			.get('conversations')
+			.get(user.userPub)
+			.get(conversationId.id)
+			.get('messages')
 			.map()
 			.once((data, id) => {
 				if (!data || data.length === 0) return;
@@ -35,7 +42,7 @@ const Images = () => {
 				}
 			});
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, []);
+	}, [conversationId, user]);
 
 	return (
 		<div className="flex flex-wrap content-start gap-4 p-4 overflow-x-hidden overflow-y-auto h-80">

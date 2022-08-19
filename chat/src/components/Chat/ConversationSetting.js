@@ -1,14 +1,40 @@
-import React, { useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import { gun } from '../../App';
+import { useTheme } from '../../contexts/themeContext';
+import { useUserStore } from '../../store';
 import { THEMES } from '../../utils/constants';
-const conversation = {
-	theme: '#0D90F3',
-};
 
 const ConversationSetting = ({ setIsOpened, setMediaViewOpened }) => {
 	const [isChangeThemeOpened, setIsChangeThemeOpened] = useState(false);
+	const { theme: conversationTheme, setTheme } = useTheme();
+	const { user } = useUserStore();
 	const { id } = useParams();
-	const navigate = useNavigate();
+	useEffect(() => {
+		if (!user || !id) return;
+		gun
+			.get('conversations')
+			.get(user.userPub)
+			.get(id)
+			.once((data) => {
+				console.log(data);
+				if (!data || !data.theme) {
+					setTheme(THEMES[0] || '#0D90F3');
+					return;
+				}
+				setTheme(data.theme);
+			});
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [user, id]);
+	const handleChangeTheme = (theme) => {
+		console.log(theme);
+		setTheme(theme);
+		gun.get('conversations').get(user.userPub).get(id).put({
+			theme,
+		});
+		setIsChangeThemeOpened(false);
+		setIsOpened(false);
+	};
 	return (
 		<>
 			<div className="flex items-center justify-between px-3 py-3 border-b border-primary">
@@ -52,9 +78,9 @@ const ConversationSetting = ({ setIsOpened, setMediaViewOpened }) => {
 							<div
 								key={theme}
 								style={{ background: theme }}
-								// onClick={() => changeTheme(theme)}
+								onClick={() => handleChangeTheme(theme)}
 								className={`h-14 w-14 cursor-pointer rounded-full transition-all duration-300 ease-in-out hover:brightness-125 ${
-									conversation.theme === theme ? 'check-overlay' : ''
+									conversationTheme === theme ? 'check-overlay' : ''
 								}`}
 							></div>
 						))}

@@ -9,7 +9,9 @@ import { useEffect } from 'react';
 import { useDarkModeSetting, useUserStore } from './store';
 import HomeChat from './pages/HomeChat';
 import HomePage from './pages/HomePage';
-import VideoCall from "./components/VideoCall/VideoCall";
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import VideoCall from './components/VideoCall/VideoCall';
 
 function App() {
 	const darkMode = useDarkModeSetting((state) => state.darkMode);
@@ -50,6 +52,18 @@ function App() {
 						<div className="absolute right-0 z-10 inline-block m-3 top-2 translate-y-[1px] ">
 							<Toggle on={darkMode} onClick={toggleDarkMode}></Toggle>
 						</div>
+						<ToastContainer
+							position="top-right"
+							autoClose={3000}
+							hideProgressBar={false}
+							newestOnTop
+							closeOnClick
+							rtl={false}
+							pauseOnFocusLoss={false}
+							draggable
+							pauseOnHover
+							theme={darkMode ? 'dark' : 'light'}
+						/>
 						<Outlet />
 					</>
 				}

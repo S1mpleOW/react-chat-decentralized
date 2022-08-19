@@ -26,7 +26,7 @@ const Input = ({
 			<input
 				className={`w-full ${
 					hasIcon ? 'py-5 pl-5 pr-16' : 'p-5'
-				} ${className} dark:bg-white dark:text-dark outline-none rounded-xl border-2 border-solid border-transparent transition-all duration-300 ease-in-out focus:border-green-primary`}
+				} ${className} dark:bg-white bg-light-lighten dark:text-dark outline-none rounded-xl border-2 border-solid border-transparent transition-all duration-300 ease-in-out focus:border-green-primary`}
 				type={type}
 				placeholder={placeholder}
 				id={id ? id : name}
