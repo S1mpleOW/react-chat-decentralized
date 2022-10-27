@@ -51,7 +51,7 @@ const ChatHeader = () => {
 					) : (
 						<>
 							<img src={receiver?.photoURL} className="w-10 h-10 rounded-full" alt="avatar" />
-							<p>Name</p>
+							<p>{receiver?.name}</p>
 						</>
 					)}
 				</div>
